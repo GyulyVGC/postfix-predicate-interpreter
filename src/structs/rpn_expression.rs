@@ -1,7 +1,7 @@
 use crate::enums::rpn_token::RpnToken;
 use crate::internals::stack_item::StackItem;
-use crate::traits::rpn_evaluator::RpnPredicateEvaluator;
 use crate::RpnOperator;
+use crate::traits::rpn_evaluator::RpnPredicateEvaluator;
 
 pub struct RpnExpression<Predicate> {
     tokens: Vec<RpnToken<Predicate>>,
