@@ -6,4 +6,3 @@ mod enums;
 mod internals;
 mod structs;
 mod traits;
-
