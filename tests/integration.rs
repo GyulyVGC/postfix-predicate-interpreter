@@ -1,4 +1,4 @@
-use generic_rpn_interpreter::{RpnExpression, RpnOperator, RpnPredicateEvaluator, RpnToken};
+use rpn_predicate_interpreter::{RpnExpression, RpnOperator, RpnPredicateEvaluator, RpnToken};
 
 struct Predicate {
     condition: PredicateCondition,
