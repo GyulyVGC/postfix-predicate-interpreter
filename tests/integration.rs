@@ -1,4 +1,4 @@
-use generic_rpn_interpreter::{RpnOperator, RpnPredicateEvaluator};
+use generic_rpn_interpreter::{RpnExpression, RpnOperator, RpnPredicateEvaluator, RpnToken};
 
 struct Predicate {
     condition: PredicateCondition,
@@ -57,10 +57,10 @@ fn test_rpn() {
         val: "3".to_string(),
     };
 
-    let expr = generic_rpn_interpreter::RpnExpression::from_tokens(vec![
-        generic_rpn_interpreter::RpnToken::Predicate(a),
-        generic_rpn_interpreter::RpnToken::Predicate(b),
-        generic_rpn_interpreter::RpnToken::Operator(RpnOperator::Or),
+    let expr = RpnExpression::from_tokens(vec![
+        RpnToken::Predicate(a),
+        RpnToken::Predicate(b),
+        RpnToken::Operator(RpnOperator::Or),
     ]);
 
     assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
