@@ -1,12 +1,12 @@
 use crate::traits::rpn_evaluator::RpnEvaluator;
 
-pub(crate) enum StackItem<'a, Ctx: RpnEvaluator> {
-    Predicate(&'a Ctx::Predicate),
+pub(crate) enum StackItem<'a, Predicate> {
+    Predicate(&'a Predicate),
     Result(bool),
 }
 
-impl<Ctx: RpnEvaluator> StackItem<'_, Ctx> {
-    pub(crate) fn evaluate(&self, context: &Ctx) -> bool {
+impl<Predicate> StackItem<'_, Predicate> {
+    pub(crate) fn evaluate(&self, context: &dyn RpnEvaluator<Predicate=Predicate>) -> bool {
         match self {
             StackItem::Predicate(predicate) => context.evaluate_predicate(predicate),
             StackItem::Result(result) => *result,

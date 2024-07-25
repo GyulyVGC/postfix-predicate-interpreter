@@ -2,17 +2,17 @@ use crate::enums::rpn_token::RpnToken;
 use crate::internals::stack_item::StackItem;
 use crate::traits::rpn_evaluator::RpnEvaluator;
 
-pub struct RpnExpression<E: RpnEvaluator> {
-    tokens: Vec<RpnToken<E::Predicate>>,
+pub struct RpnExpression<Predicate> {
+    tokens: Vec<RpnToken<Predicate>>,
 }
 
-impl<E: RpnEvaluator> RpnExpression<E> {
-    pub fn from_tokens(tokens: Vec<RpnToken<E::Predicate>>) -> Self {
+impl<Predicate> RpnExpression<Predicate> {
+    pub fn from_tokens(tokens: Vec<RpnToken<Predicate>>) -> Self {
         RpnExpression { tokens }
     }
 
-    pub fn evaluate(&self, evaluator: &E) -> bool {
-        let mut stack: Vec<StackItem<E>> = Vec::new();
+    pub fn evaluate(&self, evaluator: &dyn RpnEvaluator<Predicate=Predicate>) -> bool {
+        let mut stack: Vec<StackItem<Predicate>> = Vec::new();
         for token in &self.tokens {
             match token {
                 RpnToken::Operator(op) => {
