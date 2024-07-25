@@ -1,5 +1,5 @@
 [package]
-name = "generic-rpn-interpreter"
+name = "rpn-predicate-interpreter"
 version = "0.1.0"
 edition = "2021"
 
