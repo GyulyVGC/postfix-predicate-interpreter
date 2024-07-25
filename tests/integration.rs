@@ -1,4 +1,4 @@
-use generic_rpn_interpreter::RpnEvaluator;
+use generic_rpn_interpreter::{RpnOperator, RpnPredicateEvaluator};
 
 struct Predicate {
     condition: PredicateCondition,
@@ -20,7 +20,7 @@ struct MyReal {
     val: f32,
 }
 
-impl RpnEvaluator for MyInteger {
+impl RpnPredicateEvaluator for MyInteger {
     type Predicate = Predicate;
 
     fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
@@ -33,7 +33,7 @@ impl RpnEvaluator for MyInteger {
     }
 }
 
-impl RpnEvaluator for MyReal {
+impl RpnPredicateEvaluator for MyReal {
     type Predicate = Predicate;
 
     fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
@@ -60,18 +60,18 @@ fn test_rpn() {
     let expr = generic_rpn_interpreter::RpnExpression::from_tokens(vec![
         generic_rpn_interpreter::RpnToken::Predicate(a),
         generic_rpn_interpreter::RpnToken::Predicate(b),
-        generic_rpn_interpreter::RpnToken::Operator(generic_rpn_interpreter::RpnOperator::Or),
+        generic_rpn_interpreter::RpnToken::Operator(RpnOperator::Or),
     ]);
 
-    assert!(!expr.evaluate(&MyInteger { val: 7 }));
-    assert!(!expr.evaluate(&MyInteger { val: 6 }));
-    assert!(expr.evaluate(&MyInteger { val: 5 }));
-    assert!(!expr.evaluate(&MyInteger { val: 4 }));
-    assert!(expr.evaluate(&MyInteger { val: 3 }));
+    assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 6 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 5 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 4 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 3 }).unwrap());
 
-    assert!(!expr.evaluate(&MyReal { val: 7.0 }));
-    assert!(!expr.evaluate(&MyReal { val: 6.0 }));
-    assert!(expr.evaluate(&MyReal { val: 5.0 }));
-    assert!(!expr.evaluate(&MyReal { val: 4.0 }));
-    assert!(expr.evaluate(&MyReal { val: 3.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 7.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 6.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 5.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 4.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 3.0 }).unwrap());
 }
