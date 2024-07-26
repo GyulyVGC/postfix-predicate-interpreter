@@ -172,3 +172,48 @@ fn test_many_and() {
     assert!(!expr.evaluate(&MyReal { val: 7.0 }).unwrap());
     assert!(expr.evaluate(&MyReal { val: 1.0 }).unwrap());
 }
+
+#[test]
+// a+b+c+d --> ab+c+d+
+fn test_many_or() {
+    let a = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "1".to_string(),
+    };
+    let b = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "2".to_string(),
+    };
+    let c = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "3".to_string(),
+    };
+    let d = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "4".to_string(),
+    };
+
+    let expr = RpnExpression::from_tokens(vec![
+        RpnToken::Predicate(a),
+        RpnToken::Predicate(b),
+        RpnToken::Operator(RpnOperator::Or),
+        RpnToken::Predicate(c),
+        RpnToken::Operator(RpnOperator::Or),
+        RpnToken::Predicate(d),
+        RpnToken::Operator(RpnOperator::Or),
+    ]);
+
+    assert!(!expr.evaluate(&MyInteger { val: 0 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 1 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 2 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 3 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 4 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 5 }).unwrap());
+
+    assert!(!expr.evaluate(&MyReal { val: 0.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 1.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 2.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 3.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 4.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 5.0 }).unwrap());
+}
