@@ -21,8 +21,11 @@ impl<Predicate> RpnExpression<Predicate> {
         for token in &self.tokens {
             match token {
                 RpnToken::Operator(op) => {
-                    let p2 = stack.pop()?;
-                    let p1 = stack.pop()?;
+                    let mut p2 = stack.pop()?;
+                    let mut p1 = stack.pop()?;
+                    if matches!(p1, StackItem::Predicate(_)) && matches!(p2, StackItem::Result(_)) {
+                        std::mem::swap(&mut p1, &mut p2);
+                    }
                     let result = match op {
                         RpnOperator::And => p1.evaluate(evaluator) && p2.evaluate(evaluator),
                         RpnOperator::Or => p1.evaluate(evaluator) || p2.evaluate(evaluator),

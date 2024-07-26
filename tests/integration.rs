@@ -47,7 +47,37 @@ impl RpnPredicateEvaluator for MyReal {
 }
 
 #[test]
-fn test_rpn() {
+// a+b --> ab+
+fn test_rpn_simple() {
+    let a = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "33".to_string(),
+    };
+    let b = Predicate {
+        condition: PredicateCondition::LowerThan,
+        val: "10".to_string(),
+    };
+
+    let expr = RpnExpression::from_tokens(vec![
+        RpnToken::Predicate(a),
+        RpnToken::Predicate(b),
+        RpnToken::Operator(RpnOperator::Or),
+    ]);
+
+    assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 12 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 11 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 10 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 9 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 8 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 7 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 6 }).unwrap());
+}
+
+#[test]
+// a+b*(c+d+e*(f+g)) --> abcd+efg+*+*+
+fn test_rpn_complex() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: "5".to_string(),
@@ -56,10 +86,40 @@ fn test_rpn() {
         condition: PredicateCondition::Equal,
         val: "3".to_string(),
     };
+    let c = Predicate {
+        condition: PredicateCondition::NotEqual,
+        val: "4".to_string(),
+    };
+    let d = Predicate {
+        condition: PredicateCondition::GreaterThan,
+        val: "6".to_string(),
+    };
+    let e = Predicate {
+        condition: PredicateCondition::LowerThan,
+        val: "9".to_string(),
+    };
+    let f = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "7".to_string(),
+    };
+    let g = Predicate {
+        condition: PredicateCondition::NotEqual,
+        val: "8".to_string(),
+    };
 
     let expr = RpnExpression::from_tokens(vec![
         RpnToken::Predicate(a),
         RpnToken::Predicate(b),
+        RpnToken::Predicate(c),
+        RpnToken::Predicate(d),
+        RpnToken::Operator(RpnOperator::Or),
+        RpnToken::Predicate(e),
+        RpnToken::Predicate(f),
+        RpnToken::Predicate(g),
+        RpnToken::Operator(RpnOperator::Or),
+        RpnToken::Operator(RpnOperator::And),
+        RpnToken::Operator(RpnOperator::Or),
+        RpnToken::Operator(RpnOperator::And),
         RpnToken::Operator(RpnOperator::Or),
     ]);
 
