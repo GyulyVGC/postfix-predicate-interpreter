@@ -135,3 +135,40 @@ fn test_rpn_complex() {
     assert!(!expr.evaluate(&MyReal { val: 4.0 }).unwrap());
     assert!(expr.evaluate(&MyReal { val: 3.0 }).unwrap());
 }
+
+#[test]
+// a*b*c*d --> ab*c*d*
+fn test_many_and() {
+    let a = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "1".to_string(),
+    };
+    let b = Predicate {
+        condition: PredicateCondition::NotEqual,
+        val: "2".to_string(),
+    };
+    let c = Predicate {
+        condition: PredicateCondition::NotEqual,
+        val: "3".to_string(),
+    };
+    let d = Predicate {
+        condition: PredicateCondition::LowerThan,
+        val: "4".to_string(),
+    };
+
+    let expr = RpnExpression::from_tokens(vec![
+        RpnToken::Predicate(a),
+        RpnToken::Predicate(b),
+        RpnToken::Operator(RpnOperator::And),
+        RpnToken::Predicate(c),
+        RpnToken::Operator(RpnOperator::And),
+        RpnToken::Predicate(d),
+        RpnToken::Operator(RpnOperator::And),
+    ]);
+
+    assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 1 }).unwrap());
+
+    assert!(!expr.evaluate(&MyReal { val: 7.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 1.0 }).unwrap());
+}
