@@ -1,4 +1,4 @@
-use rpn_predicate_interpreter::{RpnExpression, RpnOperator, RpnPredicateEvaluator, RpnToken};
+use rpn_predicate_interpreter::{Operator, PostfixExpression, PostfixToken, PredicateEvaluator};
 
 struct Predicate {
     condition: PredicateCondition,
@@ -20,7 +20,7 @@ struct MyReal {
     val: f32,
 }
 
-impl RpnPredicateEvaluator for MyInteger {
+impl PredicateEvaluator for MyInteger {
     type Predicate = Predicate;
 
     fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
@@ -33,7 +33,7 @@ impl RpnPredicateEvaluator for MyInteger {
     }
 }
 
-impl RpnPredicateEvaluator for MyReal {
+impl PredicateEvaluator for MyReal {
     type Predicate = Predicate;
 
     fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
@@ -58,10 +58,10 @@ fn test_rpn_simple() {
         val: "10".to_string(),
     };
 
-    let expr = RpnExpression::from_tokens(vec![
-        RpnToken::Predicate(a),
-        RpnToken::Predicate(b),
-        RpnToken::Operator(RpnOperator::Or),
+    let expr = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate(a),
+        PostfixToken::Predicate(b),
+        PostfixToken::Operator(Operator::Or),
     ]);
 
     assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
@@ -107,20 +107,20 @@ fn test_rpn_complex() {
         val: "8".to_string(),
     };
 
-    let expr = RpnExpression::from_tokens(vec![
-        RpnToken::Predicate(a),
-        RpnToken::Predicate(b),
-        RpnToken::Predicate(c),
-        RpnToken::Predicate(d),
-        RpnToken::Operator(RpnOperator::Or),
-        RpnToken::Predicate(e),
-        RpnToken::Predicate(f),
-        RpnToken::Predicate(g),
-        RpnToken::Operator(RpnOperator::Or),
-        RpnToken::Operator(RpnOperator::And),
-        RpnToken::Operator(RpnOperator::Or),
-        RpnToken::Operator(RpnOperator::And),
-        RpnToken::Operator(RpnOperator::Or),
+    let expr = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate(a),
+        PostfixToken::Predicate(b),
+        PostfixToken::Predicate(c),
+        PostfixToken::Predicate(d),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate(e),
+        PostfixToken::Predicate(f),
+        PostfixToken::Predicate(g),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Operator(Operator::Or),
     ]);
 
     assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
@@ -156,14 +156,14 @@ fn test_many_and() {
         val: "4".to_string(),
     };
 
-    let expr = RpnExpression::from_tokens(vec![
-        RpnToken::Predicate(a),
-        RpnToken::Predicate(b),
-        RpnToken::Operator(RpnOperator::And),
-        RpnToken::Predicate(c),
-        RpnToken::Operator(RpnOperator::And),
-        RpnToken::Predicate(d),
-        RpnToken::Operator(RpnOperator::And),
+    let expr = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate(a),
+        PostfixToken::Predicate(b),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Predicate(c),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Predicate(d),
+        PostfixToken::Operator(Operator::And),
     ]);
 
     assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
@@ -193,14 +193,14 @@ fn test_many_or() {
         val: "4".to_string(),
     };
 
-    let expr = RpnExpression::from_tokens(vec![
-        RpnToken::Predicate(a),
-        RpnToken::Predicate(b),
-        RpnToken::Operator(RpnOperator::Or),
-        RpnToken::Predicate(c),
-        RpnToken::Operator(RpnOperator::Or),
-        RpnToken::Predicate(d),
-        RpnToken::Operator(RpnOperator::Or),
+    let expr = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate(a),
+        PostfixToken::Predicate(b),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate(c),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate(d),
+        PostfixToken::Operator(Operator::Or),
     ]);
 
     assert!(!expr.evaluate(&MyInteger { val: 0 }).unwrap());

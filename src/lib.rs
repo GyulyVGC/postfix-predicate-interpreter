@@ -1,6 +1,6 @@
-pub use enums::{rpn_operator::RpnOperator, rpn_token::RpnToken};
-pub use structs::rpn_expression::RpnExpression;
-pub use traits::rpn_evaluator::RpnPredicateEvaluator;
+pub use enums::{operator::Operator, postfix_token::PostfixToken};
+pub use structs::postfix_expression::PostfixExpression;
+pub use traits::predicate_evaluator::PredicateEvaluator;
 
 mod enums;
 mod internals;

@@ -1,4 +1,4 @@
-use crate::traits::rpn_evaluator::RpnPredicateEvaluator;
+use crate::traits::predicate_evaluator::PredicateEvaluator;
 
 pub(crate) enum StackItem<'a, Predicate> {
     Predicate(&'a Predicate),
@@ -8,7 +8,7 @@ pub(crate) enum StackItem<'a, Predicate> {
 impl<Predicate> StackItem<'_, Predicate> {
     pub(crate) fn evaluate(
         &self,
-        evaluator: &dyn RpnPredicateEvaluator<Predicate = Predicate>,
+        evaluator: &dyn PredicateEvaluator<Predicate = Predicate>,
     ) -> bool {
         match self {
             StackItem::Predicate(predicate) => evaluator.evaluate_predicate(predicate),
