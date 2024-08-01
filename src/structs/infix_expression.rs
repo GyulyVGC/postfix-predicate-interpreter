@@ -16,7 +16,7 @@ impl<Predicate> InfixExpression<Predicate> {
     }
 
     #[must_use]
-    pub fn to_postfix(self) -> Option<PostfixExpression<Predicate>> {
+    pub fn to_postfix(self) -> PostfixExpression<Predicate> {
         let mut stack: Vec<InfixStackItem> = Vec::new();
         let mut output_queue: Vec<PostfixToken<Predicate>> = Vec::new();
 
@@ -44,9 +44,7 @@ impl<Predicate> InfixExpression<Predicate> {
                         output_queue.push(PostfixToken::Operator(*op));
                         stack.pop();
                     }
-                    if stack.last() != Some(&InfixStackItem::Parenthesis(Parenthesis::Open)) {
-                        return None;
-                    }
+                    // pop the open parenthesis
                     stack.pop();
                 }
             }
@@ -56,11 +54,7 @@ impl<Predicate> InfixExpression<Predicate> {
             output_queue.push(PostfixToken::Operator(op));
         }
 
-        if !stack.is_empty() {
-            return None;
-        }
-
-        Some(PostfixExpression::from_tokens(output_queue))
+        PostfixExpression::from_tokens(output_queue)
     }
 
     fn are_tokens_valid(tokens: &[InfixToken<Predicate>]) -> bool {

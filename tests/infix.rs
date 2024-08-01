@@ -16,7 +16,7 @@ fn test_infix_to_postfix_parenthesis() {
     ])
     .unwrap();
 
-    let postfix = infix.to_postfix().unwrap();
+    let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
         PostfixExpression::from_tokens(vec![
@@ -41,7 +41,7 @@ fn test_infix_to_postfix_plain() {
     ])
     .unwrap();
 
-    let postfix = infix.to_postfix().unwrap();
+    let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
         PostfixExpression::from_tokens(vec![
@@ -59,7 +59,7 @@ fn test_infix_to_postfix_plain() {
 fn test_infix_to_postfix_single() {
     let infix = InfixExpression::from_tokens(vec![InfixToken::Predicate("a")]).unwrap();
 
-    let postfix = infix.to_postfix().unwrap();
+    let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
         PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a"),])
@@ -73,9 +73,10 @@ fn test_infix_to_postfix_single_with_parenthesis() {
         InfixToken::Parenthesis(Parenthesis::Open),
         InfixToken::Predicate("a"),
         InfixToken::Parenthesis(Parenthesis::Close),
-    ]).unwrap();
+    ])
+    .unwrap();
 
-    let postfix = infix.to_postfix().unwrap();
+    let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
         PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a"),])
@@ -91,9 +92,10 @@ fn test_infix_to_postfix_simple_with_parenthesis() {
         InfixToken::Operator(Operator::Or),
         InfixToken::Predicate("b"),
         InfixToken::Parenthesis(Parenthesis::Close),
-    ]).unwrap();
+    ])
+    .unwrap();
 
-    let postfix = infix.to_postfix().unwrap();
+    let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
         PostfixExpression::from_tokens(vec![
@@ -120,7 +122,7 @@ fn test_infix_to_postfix_and_or() {
         ])
         .unwrap();
 
-        let postfix = infix.to_postfix().unwrap();
+        let postfix = infix.to_postfix();
         assert_eq!(
             postfix,
             PostfixExpression::from_tokens(vec![
@@ -170,7 +172,7 @@ fn test_infix_to_postfix_complex() {
     ])
     .unwrap();
 
-    let postfix = infix.to_postfix().unwrap();
+    let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
         PostfixExpression::from_tokens(vec![
@@ -332,10 +334,8 @@ fn test_infix_invalid_using_postfix() {
 #[test]
 // ab [invalid]
 fn test_infix_invalid_only_predicates() {
-    let infix = InfixExpression::from_tokens(vec![
-        InfixToken::Predicate("a"),
-        InfixToken::Predicate("b"),
-    ]);
+    let infix =
+        InfixExpression::from_tokens(vec![InfixToken::Predicate("a"), InfixToken::Predicate("b")]);
     assert!(infix.is_none());
 }
 
