@@ -47,6 +47,25 @@ impl PredicateEvaluator for MyReal {
 }
 
 #[test]
+// a --> a
+fn test_postfix_evaluate_single() {
+    let a = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "33".to_string(),
+    };
+
+    let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]);
+
+    assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 12 }).unwrap());
+
+    assert!(!expr.evaluate(&MyReal { val: 34.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 33.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 12.0 }).unwrap());
+}
+
+#[test]
 // a+b --> ab+
 fn test_postfix_evaluate_simple() {
     let a = Predicate {
