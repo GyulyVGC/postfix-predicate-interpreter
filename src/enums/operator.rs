@@ -12,3 +12,13 @@ impl Operator {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_operators_precedence() {
+        assert!(Operator::And.precedence() > Operator::Or.precedence());
+    }
+}
