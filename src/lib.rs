@@ -1,5 +1,8 @@
-pub use enums::{operator::Operator, postfix_token::PostfixToken};
-pub use structs::postfix_expression::PostfixExpression;
+pub use enums::{
+    infix_token::InfixToken, operator::Operator, parenthesis::Parenthesis,
+    postfix_token::PostfixToken,
+};
+pub use structs::{infix_expression::InfixExpression, postfix_expression::PostfixExpression};
 pub use traits::predicate_evaluator::PredicateEvaluator;
 
 mod enums;

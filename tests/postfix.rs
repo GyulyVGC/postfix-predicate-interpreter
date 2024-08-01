@@ -47,8 +47,27 @@ impl PredicateEvaluator for MyReal {
 }
 
 #[test]
+// a --> a
+fn test_postfix_evaluate_single() {
+    let a = Predicate {
+        condition: PredicateCondition::Equal,
+        val: "33".to_string(),
+    };
+
+    let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]);
+
+    assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
+    assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 12 }).unwrap());
+
+    assert!(!expr.evaluate(&MyReal { val: 34.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 33.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 12.0 }).unwrap());
+}
+
+#[test]
 // a+b --> ab+
-fn test_rpn_simple() {
+fn test_postfix_evaluate_simple() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: "33".to_string(),
@@ -73,11 +92,21 @@ fn test_rpn_simple() {
     assert!(expr.evaluate(&MyInteger { val: 8 }).unwrap());
     assert!(expr.evaluate(&MyInteger { val: 7 }).unwrap());
     assert!(expr.evaluate(&MyInteger { val: 6 }).unwrap());
+
+    assert!(!expr.evaluate(&MyReal { val: 34.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 33.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 12.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 11.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 10.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 9.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 8.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 7.0 }).unwrap());
+    assert!(expr.evaluate(&MyReal { val: 6.0 }).unwrap());
 }
 
 #[test]
 // a+b*(c+d+e*(f+g)) --> abcd+efg+*+*+
-fn test_rpn_complex() {
+fn test_postfix_evaluate_complex() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: "5".to_string(),
@@ -138,7 +167,7 @@ fn test_rpn_complex() {
 
 #[test]
 // a*b*c*d --> ab*c*d*
-fn test_many_and() {
+fn test_postfix_evaluate_many_and() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: "1".to_string(),
@@ -175,7 +204,7 @@ fn test_many_and() {
 
 #[test]
 // a+b+c+d --> ab+c+d+
-fn test_many_or() {
+fn test_postfix_evaluate_many_or() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: "1".to_string(),

@@ -1,0 +1,62 @@
+use crate::internals::infix_stack_item::InfixStackItem;
+use crate::{InfixToken, Parenthesis, PostfixExpression, PostfixToken};
+
+pub struct InfixExpression<Predicate> {
+    tokens: Vec<InfixToken<Predicate>>,
+}
+
+impl<Predicate> InfixExpression<Predicate> {
+    #[must_use]
+    pub fn from_tokens(tokens: Vec<InfixToken<Predicate>>) -> Self {
+        // TODO: verify that the expression is valid
+        InfixExpression { tokens }
+    }
+
+    #[must_use]
+    pub fn to_postfix(self) -> Option<PostfixExpression<Predicate>> {
+        let mut stack: Vec<InfixStackItem> = Vec::new();
+        let mut output_queue: Vec<PostfixToken<Predicate>> = Vec::new();
+
+        for token in self.tokens {
+            match token {
+                InfixToken::Predicate(p) => {
+                    output_queue.push(PostfixToken::Predicate(p));
+                }
+                InfixToken::Operator(op) => {
+                    let precedence = op.precedence();
+                    while let Some(InfixStackItem::Operator(stack_op)) = stack.last() {
+                        if precedence > stack_op.precedence() {
+                            break;
+                        }
+                        output_queue.push(PostfixToken::Operator(*stack_op));
+                        stack.pop();
+                    }
+                    stack.push(InfixStackItem::Operator(op));
+                }
+                InfixToken::Parenthesis(Parenthesis::Open) => {
+                    stack.push(InfixStackItem::Parenthesis(Parenthesis::Open));
+                }
+                InfixToken::Parenthesis(Parenthesis::Close) => {
+                    while let Some(InfixStackItem::Operator(op)) = stack.last() {
+                        output_queue.push(PostfixToken::Operator(*op));
+                        stack.pop();
+                    }
+                    if stack.last() != Some(&InfixStackItem::Parenthesis(Parenthesis::Open)) {
+                        return None;
+                    }
+                    stack.pop();
+                }
+            }
+        }
+
+        while let Some(InfixStackItem::Operator(op)) = stack.pop() {
+            output_queue.push(PostfixToken::Operator(op));
+        }
+
+        if !stack.is_empty() {
+            return None;
+        }
+
+        Some(PostfixExpression::from_tokens(output_queue))
+    }
+}
