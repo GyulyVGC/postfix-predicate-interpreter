@@ -1,7 +1,7 @@
 use crate::enums::postfix_token::PostfixToken;
 use crate::internals::postfix_stack_item::PostfixStackItem;
 use crate::traits::predicate_evaluator::PredicateEvaluator;
-use crate::Operator;
+use crate::{InfixExpression, Operator};
 
 #[derive(Debug, PartialEq)]
 pub struct PostfixExpression<Predicate> {
@@ -13,6 +13,12 @@ impl<Predicate> PostfixExpression<Predicate> {
     pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Self {
         // TODO: verify that the expression is valid
         PostfixExpression { tokens }
+    }
+
+    #[must_use]
+    pub fn to_infix(self) -> Option<InfixExpression<Predicate>> {
+        // TODO: postfix to infix conversion
+        unimplemented!();
     }
 
     pub fn evaluate(

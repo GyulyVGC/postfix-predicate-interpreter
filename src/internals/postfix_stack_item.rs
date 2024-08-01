@@ -19,8 +19,9 @@ impl<Predicate> PostfixStackItem<'_, Predicate> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::traits::predicate_evaluator::PredicateEvaluator;
+
+    use super::*;
 
     struct MyInteger {
         val: i32,
