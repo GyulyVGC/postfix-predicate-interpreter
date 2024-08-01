@@ -7,9 +7,12 @@ pub struct InfixExpression<Predicate> {
 
 impl<Predicate> InfixExpression<Predicate> {
     #[must_use]
-    pub fn from_tokens(tokens: Vec<InfixToken<Predicate>>) -> Self {
-        // TODO: verify that the expression is valid
-        InfixExpression { tokens }
+    pub fn from_tokens(tokens: Vec<InfixToken<Predicate>>) -> Option<Self> {
+        if Self::are_tokens_valid(&tokens) {
+            Some(Self { tokens })
+        } else {
+            None
+        }
     }
 
     #[must_use]
@@ -58,5 +61,61 @@ impl<Predicate> InfixExpression<Predicate> {
         }
 
         Some(PostfixExpression::from_tokens(output_queue))
+    }
+
+    fn are_tokens_valid(tokens: &[InfixToken<Predicate>]) -> bool {
+        let mut operator_stack: Vec<InfixStackItem> = Vec::new();
+        let mut predicate_stack: Vec<&Predicate> = Vec::new();
+        let mut predicate_expected = true;
+
+        for token in tokens {
+            match token {
+                InfixToken::Predicate(p) => {
+                    if !predicate_expected {
+                        return false;
+                    }
+                    predicate_stack.push(p);
+                    predicate_expected = false;
+                }
+                InfixToken::Operator(op) => {
+                    operator_stack.push(InfixStackItem::Operator(*op));
+                    predicate_expected = true;
+                }
+                InfixToken::Parenthesis(Parenthesis::Open) => {
+                    operator_stack.push(InfixStackItem::Parenthesis(Parenthesis::Open));
+                }
+                InfixToken::Parenthesis(Parenthesis::Close) => {
+                    while let Some(InfixStackItem::Operator(_)) = operator_stack.last() {
+                        operator_stack.pop();
+                        if predicate_stack.len() < 2 {
+                            return false;
+                        }
+                        predicate_stack.pop();
+                    }
+                    if operator_stack.last()
+                        != Some(&InfixStackItem::Parenthesis(Parenthesis::Open))
+                    {
+                        return false;
+                    }
+                    operator_stack.pop();
+                }
+            }
+        }
+
+        while let Some(item) = operator_stack.pop() {
+            match item {
+                InfixStackItem::Operator(_) => {
+                    if predicate_stack.len() < 2 {
+                        return false;
+                    }
+                    predicate_stack.pop();
+                }
+                InfixStackItem::Parenthesis(_) => {
+                    return false;
+                }
+            }
+        }
+
+        predicate_stack.len() == 1 && operator_stack.is_empty()
     }
 }
