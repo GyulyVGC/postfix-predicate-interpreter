@@ -116,7 +116,7 @@ fn test_infix_to_postfix_simple_with_more_parenthesis() {
         InfixToken::Predicate("b"),
         InfixToken::Parenthesis(Parenthesis::Close),
     ])
-        .unwrap();
+    .unwrap();
 
     let postfix = infix.to_postfix();
     assert_eq!(

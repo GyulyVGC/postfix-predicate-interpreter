@@ -8,11 +8,7 @@ pub struct InfixExpression<Predicate> {
 impl<Predicate> InfixExpression<Predicate> {
     #[must_use]
     pub fn from_tokens(tokens: Vec<InfixToken<Predicate>>) -> Option<Self> {
-        if Self::are_tokens_valid(&tokens) {
-            Some(Self { tokens })
-        } else {
-            None
-        }
+        Self::are_tokens_valid(&tokens).then(|| Self { tokens })
     }
 
     #[must_use]

@@ -49,4 +49,9 @@ impl<Predicate> PostfixExpression<Predicate> {
         }
         Some(stack.pop()?.evaluate(evaluator))
     }
+
+    fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
+        // TODO: verify that the expression is valid
+        unimplemented!();
+    }
 }
