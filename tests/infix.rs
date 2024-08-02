@@ -107,6 +107,29 @@ fn test_infix_to_postfix_simple_with_parenthesis() {
 }
 
 #[test]
+// ((a)+(b)) --> ab+
+fn test_infix_to_postfix_simple_with_more_parenthesis() {
+    let infix = InfixExpression::from_tokens(vec![
+        InfixToken::Parenthesis(Parenthesis::Open),
+        InfixToken::Predicate("a"),
+        InfixToken::Operator(Operator::Or),
+        InfixToken::Predicate("b"),
+        InfixToken::Parenthesis(Parenthesis::Close),
+    ])
+        .unwrap();
+
+    let postfix = infix.to_postfix();
+    assert_eq!(
+        postfix,
+        PostfixExpression::from_tokens(vec![
+            PostfixToken::Predicate("a"),
+            PostfixToken::Predicate("b"),
+            PostfixToken::Operator(Operator::Or),
+        ])
+    );
+}
+
+#[test]
 // a*b*c*d --> ab*c*d*
 // a+b+c+d --> ab+c+d+
 fn test_infix_to_postfix_and_or() {
