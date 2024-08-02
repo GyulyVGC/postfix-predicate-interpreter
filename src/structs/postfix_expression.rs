@@ -10,15 +10,13 @@ pub struct PostfixExpression<Predicate> {
 
 impl<Predicate> PostfixExpression<Predicate> {
     #[must_use]
-    pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Self {
-        // TODO: verify that the expression is valid
-        PostfixExpression { tokens }
+    pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Option<Self> {
+        Self::are_tokens_valid(&tokens).then(|| Self { tokens })
     }
 
     #[must_use]
     pub fn to_infix(self) -> Option<InfixExpression<Predicate>> {
-        // TODO: postfix to infix conversion
-        unimplemented!();
+        todo!("postfix to infix conversion");
     }
 
     pub fn evaluate(
@@ -50,8 +48,11 @@ impl<Predicate> PostfixExpression<Predicate> {
         Some(stack.pop()?.evaluate(evaluator))
     }
 
+    pub(crate) fn from_tokens_unchecked(tokens: Vec<PostfixToken<Predicate>>) -> Self {
+        Self { tokens }
+    }
+
     fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
-        // TODO: verify that the expression is valid
-        unimplemented!();
+        todo!("verify that the expression is valid");
     }
 }

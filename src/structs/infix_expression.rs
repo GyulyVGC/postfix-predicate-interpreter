@@ -50,7 +50,7 @@ impl<Predicate> InfixExpression<Predicate> {
             output_queue.push(PostfixToken::Operator(op));
         }
 
-        PostfixExpression::from_tokens(output_queue)
+        PostfixExpression::from_tokens_unchecked(output_queue)
     }
 
     fn are_tokens_valid(tokens: &[InfixToken<Predicate>]) -> bool {

@@ -54,7 +54,7 @@ fn test_postfix_evaluate_single() {
         val: "33".to_string(),
     };
 
-    let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]);
+    let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]).unwrap();
 
     assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
     assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
@@ -81,7 +81,8 @@ fn test_postfix_evaluate_simple() {
         PostfixToken::Predicate(a),
         PostfixToken::Predicate(b),
         PostfixToken::Operator(Operator::Or),
-    ]);
+    ])
+    .unwrap();
 
     assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
     assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
@@ -150,7 +151,8 @@ fn test_postfix_evaluate_complex() {
         PostfixToken::Operator(Operator::Or),
         PostfixToken::Operator(Operator::And),
         PostfixToken::Operator(Operator::Or),
-    ]);
+    ])
+    .unwrap();
 
     assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
     assert!(!expr.evaluate(&MyInteger { val: 6 }).unwrap());
@@ -193,7 +195,8 @@ fn test_postfix_evaluate_many_and() {
         PostfixToken::Operator(Operator::And),
         PostfixToken::Predicate(d),
         PostfixToken::Operator(Operator::And),
-    ]);
+    ])
+    .unwrap();
 
     assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
     assert!(expr.evaluate(&MyInteger { val: 1 }).unwrap());
@@ -230,7 +233,8 @@ fn test_postfix_evaluate_many_or() {
         PostfixToken::Operator(Operator::Or),
         PostfixToken::Predicate(d),
         PostfixToken::Operator(Operator::Or),
-    ]);
+    ])
+    .unwrap();
 
     assert!(!expr.evaluate(&MyInteger { val: 0 }).unwrap());
     assert!(expr.evaluate(&MyInteger { val: 1 }).unwrap());
