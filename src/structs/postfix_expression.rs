@@ -19,16 +19,13 @@ impl<Predicate> PostfixExpression<Predicate> {
         todo!("postfix to infix conversion");
     }
 
-    pub fn evaluate(
-        &self,
-        evaluator: &dyn PredicateEvaluator<Predicate = Predicate>,
-    ) -> Option<bool> {
+    pub fn evaluate(&self, evaluator: &dyn PredicateEvaluator<Predicate = Predicate>) -> bool {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();
         for token in &self.tokens {
             match token {
                 PostfixToken::Operator(op) => {
-                    let mut p2 = stack.pop()?;
-                    let mut p1 = stack.pop()?;
+                    let mut p2 = stack.remove(stack.len() - 1);
+                    let mut p1 = stack.remove(stack.len() - 1);
                     if matches!(p1, PostfixStackItem::Predicate(_))
                         && matches!(p2, PostfixStackItem::Result(_))
                     {
@@ -45,7 +42,7 @@ impl<Predicate> PostfixExpression<Predicate> {
                 }
             }
         }
-        Some(stack.pop()?.evaluate(evaluator))
+        stack.remove(stack.len() - 1).evaluate(evaluator)
     }
 
     pub(crate) fn from_tokens_unchecked(tokens: Vec<PostfixToken<Predicate>>) -> Self {

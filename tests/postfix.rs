@@ -56,13 +56,13 @@ fn test_postfix_evaluate_single() {
 
     let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]).unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 12 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 34 }));
+    assert!(expr.evaluate(&MyInteger { val: 33 }));
+    assert!(!expr.evaluate(&MyInteger { val: 12 }));
 
-    assert!(!expr.evaluate(&MyReal { val: 34.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 33.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 12.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 34.0 }));
+    assert!(expr.evaluate(&MyReal { val: 33.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 12.0 }));
 }
 
 #[test]
@@ -84,25 +84,25 @@ fn test_postfix_evaluate_simple() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 34 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 33 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 12 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 11 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 10 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 9 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 8 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 7 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 6 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 34 }));
+    assert!(expr.evaluate(&MyInteger { val: 33 }));
+    assert!(!expr.evaluate(&MyInteger { val: 12 }));
+    assert!(!expr.evaluate(&MyInteger { val: 11 }));
+    assert!(!expr.evaluate(&MyInteger { val: 10 }));
+    assert!(expr.evaluate(&MyInteger { val: 9 }));
+    assert!(expr.evaluate(&MyInteger { val: 8 }));
+    assert!(expr.evaluate(&MyInteger { val: 7 }));
+    assert!(expr.evaluate(&MyInteger { val: 6 }));
 
-    assert!(!expr.evaluate(&MyReal { val: 34.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 33.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 12.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 11.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 10.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 9.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 8.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 7.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 6.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 34.0 }));
+    assert!(expr.evaluate(&MyReal { val: 33.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 12.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 11.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 10.0 }));
+    assert!(expr.evaluate(&MyReal { val: 9.0 }));
+    assert!(expr.evaluate(&MyReal { val: 8.0 }));
+    assert!(expr.evaluate(&MyReal { val: 7.0 }));
+    assert!(expr.evaluate(&MyReal { val: 6.0 }));
 }
 
 #[test]
@@ -154,17 +154,17 @@ fn test_postfix_evaluate_complex() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 6 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 5 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 4 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 3 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 7 }));
+    assert!(!expr.evaluate(&MyInteger { val: 6 }));
+    assert!(expr.evaluate(&MyInteger { val: 5 }));
+    assert!(!expr.evaluate(&MyInteger { val: 4 }));
+    assert!(expr.evaluate(&MyInteger { val: 3 }));
 
-    assert!(!expr.evaluate(&MyReal { val: 7.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 6.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 5.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 4.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 3.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 7.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 6.0 }));
+    assert!(expr.evaluate(&MyReal { val: 5.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 4.0 }));
+    assert!(expr.evaluate(&MyReal { val: 3.0 }));
 }
 
 #[test]
@@ -198,11 +198,11 @@ fn test_postfix_evaluate_many_and() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 7 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 1 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 7 }));
+    assert!(expr.evaluate(&MyInteger { val: 1 }));
 
-    assert!(!expr.evaluate(&MyReal { val: 7.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 1.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 7.0 }));
+    assert!(expr.evaluate(&MyReal { val: 1.0 }));
 }
 
 #[test]
@@ -236,17 +236,17 @@ fn test_postfix_evaluate_many_or() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 0 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 1 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 2 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 3 }).unwrap());
-    assert!(expr.evaluate(&MyInteger { val: 4 }).unwrap());
-    assert!(!expr.evaluate(&MyInteger { val: 5 }).unwrap());
+    assert!(!expr.evaluate(&MyInteger { val: 0 }));
+    assert!(expr.evaluate(&MyInteger { val: 1 }));
+    assert!(expr.evaluate(&MyInteger { val: 2 }));
+    assert!(expr.evaluate(&MyInteger { val: 3 }));
+    assert!(expr.evaluate(&MyInteger { val: 4 }));
+    assert!(!expr.evaluate(&MyInteger { val: 5 }));
 
-    assert!(!expr.evaluate(&MyReal { val: 0.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 1.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 2.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 3.0 }).unwrap());
-    assert!(expr.evaluate(&MyReal { val: 4.0 }).unwrap());
-    assert!(!expr.evaluate(&MyReal { val: 5.0 }).unwrap());
+    assert!(!expr.evaluate(&MyReal { val: 0.0 }));
+    assert!(expr.evaluate(&MyReal { val: 1.0 }));
+    assert!(expr.evaluate(&MyReal { val: 2.0 }));
+    assert!(expr.evaluate(&MyReal { val: 3.0 }));
+    assert!(expr.evaluate(&MyReal { val: 4.0 }));
+    assert!(!expr.evaluate(&MyReal { val: 5.0 }));
 }
