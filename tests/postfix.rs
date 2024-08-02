@@ -250,3 +250,100 @@ fn test_postfix_evaluate_many_or() {
     assert!(expr.evaluate(&MyReal { val: 4.0 }));
     assert!(!expr.evaluate(&MyReal { val: 5.0 }));
 }
+
+#[test]
+// a+b [invalid]
+fn test_postfix_invalid_using_infix() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate("b"),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// *ab [invalid]
+fn test_postfix_invalid_using_prefix() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// ab [invalid]
+fn test_postfix_invalid_only_predicates() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// *+ [invalid]
+fn test_postfix_invalid_only_operators() {
+    let postfix = PostfixExpression::<u8>::from_tokens(vec![
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Operator(Operator::Or),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// * [invalid]
+// + [invalid]
+fn test_postfix_invalid_single_operator() {
+    for op in vec![Operator::And, Operator::Or] {
+        let postfix = PostfixExpression::<u8>::from_tokens(vec![PostfixToken::Operator(op)]);
+        assert!(postfix.is_none());
+    }
+}
+
+#[test]
+// a*+ [invalid]
+fn test_postfix_invalid_too_many_operators() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Operator(Operator::Or),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// a* [invalid]
+fn test_postfix_invalid_missing_a_predicate() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Operator(Operator::And),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// abc+ [invalid]
+fn test_postfix_invalid_too_many_predicates() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+        PostfixToken::Predicate("c"),
+        PostfixToken::Operator(Operator::Or),
+    ]);
+    assert!(postfix.is_none());
+}
+
+#[test]
+// ab*c [invalid]
+fn test_postfix_invalid_too_many_predicates_bis() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Predicate("c"),
+    ]);
+    assert!(postfix.is_none());
+}
