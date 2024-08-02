@@ -10,27 +10,22 @@ pub struct PostfixExpression<Predicate> {
 
 impl<Predicate> PostfixExpression<Predicate> {
     #[must_use]
-    pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Self {
-        // TODO: verify that the expression is valid
-        PostfixExpression { tokens }
+    pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Option<Self> {
+        Self::are_tokens_valid(&tokens).then(|| Self { tokens })
     }
 
     #[must_use]
     pub fn to_infix(self) -> Option<InfixExpression<Predicate>> {
-        // TODO: postfix to infix conversion
-        unimplemented!();
+        todo!("postfix to infix conversion");
     }
 
-    pub fn evaluate(
-        &self,
-        evaluator: &dyn PredicateEvaluator<Predicate = Predicate>,
-    ) -> Option<bool> {
+    pub fn evaluate(&self, evaluator: &dyn PredicateEvaluator<Predicate = Predicate>) -> bool {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();
         for token in &self.tokens {
             match token {
                 PostfixToken::Operator(op) => {
-                    let mut p2 = stack.pop()?;
-                    let mut p1 = stack.pop()?;
+                    let mut p2 = stack.remove(stack.len() - 1);
+                    let mut p1 = stack.remove(stack.len() - 1);
                     if matches!(p1, PostfixStackItem::Predicate(_))
                         && matches!(p2, PostfixStackItem::Result(_))
                     {
@@ -47,11 +42,30 @@ impl<Predicate> PostfixExpression<Predicate> {
                 }
             }
         }
-        Some(stack.pop()?.evaluate(evaluator))
+        stack.remove(stack.len() - 1).evaluate(evaluator)
+    }
+
+    pub(crate) fn from_tokens_unchecked(tokens: Vec<PostfixToken<Predicate>>) -> Self {
+        Self { tokens }
     }
 
     fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
-        // TODO: verify that the expression is valid
-        unimplemented!();
+        let mut cnt: usize = 0;
+
+        for token in tokens {
+            match token {
+                PostfixToken::Operator(_) => {
+                    if cnt < 2 {
+                        return false;
+                    }
+                    cnt -= 1;
+                }
+                PostfixToken::Predicate(_) => {
+                    cnt += 1;
+                }
+            }
+        }
+
+        cnt == 1
     }
 }

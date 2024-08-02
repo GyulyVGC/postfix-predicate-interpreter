@@ -26,6 +26,7 @@ fn test_infix_to_postfix_parenthesis() {
             PostfixToken::Operator(Operator::Or),
             PostfixToken::Operator(Operator::And),
         ])
+        .unwrap()
     );
 }
 
@@ -51,6 +52,7 @@ fn test_infix_to_postfix_plain() {
             PostfixToken::Predicate("c"),
             PostfixToken::Operator(Operator::Or),
         ])
+        .unwrap()
     );
 }
 
@@ -62,7 +64,7 @@ fn test_infix_to_postfix_single() {
     let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
-        PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a"),])
+        PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a"),]).unwrap()
     );
 }
 
@@ -79,7 +81,7 @@ fn test_infix_to_postfix_single_with_parenthesis() {
     let postfix = infix.to_postfix();
     assert_eq!(
         postfix,
-        PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a"),])
+        PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a"),]).unwrap()
     );
 }
 
@@ -103,6 +105,7 @@ fn test_infix_to_postfix_simple_with_parenthesis() {
             PostfixToken::Predicate("b"),
             PostfixToken::Operator(Operator::Or),
         ])
+        .unwrap()
     );
 }
 
@@ -126,6 +129,7 @@ fn test_infix_to_postfix_simple_with_more_parenthesis() {
             PostfixToken::Predicate("b"),
             PostfixToken::Operator(Operator::Or),
         ])
+        .unwrap()
     );
 }
 
@@ -157,6 +161,7 @@ fn test_infix_to_postfix_and_or() {
                 PostfixToken::Predicate("d"),
                 PostfixToken::Operator(op),
             ])
+            .unwrap()
         );
     }
 }
@@ -219,6 +224,7 @@ fn test_infix_to_postfix_complex() {
             PostfixToken::Operator(Operator::And),
             PostfixToken::Operator(Operator::Or),
         ])
+        .unwrap()
     );
 }
 
