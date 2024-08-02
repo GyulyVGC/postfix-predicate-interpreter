@@ -53,6 +53,22 @@ impl<Predicate> PostfixExpression<Predicate> {
     }
 
     fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
-        todo!("verify that the expression is valid");
+        let mut cnt: usize = 0;
+
+        for token in tokens {
+            match token {
+                PostfixToken::Operator(_) => {
+                    if cnt < 2 {
+                        return false;
+                    }
+                    cnt -= 1;
+                }
+                PostfixToken::Predicate(_) => {
+                    cnt += 1;
+                }
+            }
+        }
+
+        cnt == 1
     }
 }
