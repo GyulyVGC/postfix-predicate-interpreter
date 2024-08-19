@@ -31,17 +31,12 @@ impl<Predicate> PostfixExpression<Predicate> {
                     let op2 = operator_stack.remove(operator_stack.len() - 1);
                     let op1 = operator_stack.remove(operator_stack.len() - 1);
 
-                    if let Some(op1) = op1 {
-                        if op1.precedence() < op.precedence() {
-                            p1.insert(0, InfixToken::Parenthesis(Parenthesis::Open));
-                            p1.push(InfixToken::Parenthesis(Parenthesis::Close));
-                        }
-                    }
-
-                    if let Some(op2) = op2 {
-                        if op2.precedence() < op.precedence() {
-                            p2.insert(0, InfixToken::Parenthesis(Parenthesis::Open));
-                            p2.push(InfixToken::Parenthesis(Parenthesis::Close));
+                    for (operator, p) in [(op1, &mut p1), (op2, &mut p2)] {
+                        if let Some(operator) = operator {
+                            if operator.precedence() < op.precedence() {
+                                p.insert(0, InfixToken::Parenthesis(Parenthesis::Open));
+                                p.push(InfixToken::Parenthesis(Parenthesis::Close));
+                            }
                         }
                     }
 
