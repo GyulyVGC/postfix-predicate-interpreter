@@ -2,6 +2,7 @@ use crate::enums::postfix_token::PostfixToken;
 use crate::internals::postfix_stack_item::PostfixStackItem;
 use crate::traits::predicate_evaluator::PredicateEvaluator;
 use crate::{InfixExpression, InfixToken, Operator, Parenthesis};
+use std::collections::VecDeque;
 
 #[derive(Debug, PartialEq)]
 pub struct PostfixExpression<Predicate> {
@@ -17,12 +18,12 @@ impl<Predicate> PostfixExpression<Predicate> {
     #[must_use]
     pub fn to_infix(self) -> InfixExpression<Predicate> {
         let mut operator_stack: Vec<Option<Operator>> = Vec::new();
-        let mut output_stack: Vec<Vec<InfixToken<Predicate>>> = Vec::new();
+        let mut output_stack: Vec<VecDeque<InfixToken<Predicate>>> = Vec::new();
 
         for token in self.tokens {
             match token {
                 PostfixToken::Predicate(p) => {
-                    output_stack.push(vec![InfixToken::Predicate(p)]);
+                    output_stack.push(VecDeque::from([InfixToken::Predicate(p)]));
                     operator_stack.push(None);
                 }
                 PostfixToken::Operator(op) => {
@@ -34,23 +35,24 @@ impl<Predicate> PostfixExpression<Predicate> {
                     for (operator, p) in [(op1, &mut p1), (op2, &mut p2)] {
                         if let Some(operator) = operator {
                             if operator.precedence() < op.precedence() {
-                                p.insert(0, InfixToken::Parenthesis(Parenthesis::Open));
-                                p.push(InfixToken::Parenthesis(Parenthesis::Close));
+                                p.push_front(InfixToken::Parenthesis(Parenthesis::Open));
+                                p.push_back(InfixToken::Parenthesis(Parenthesis::Close));
                             }
                         }
                     }
 
-                    let mut v = Vec::new();
+                    let mut v = VecDeque::new();
                     v.extend(p1);
-                    v.push(InfixToken::Operator(op));
+                    v.push_back(InfixToken::Operator(op));
                     v.extend(p2);
+
                     output_stack.push(v);
                     operator_stack.push(Some(op));
                 }
             }
         }
 
-        InfixExpression::from_tokens_unchecked(output_stack.remove(0))
+        InfixExpression::from_tokens_unchecked(output_stack.remove(0).into())
     }
 
     pub fn evaluate(&self, evaluator: &dyn PredicateEvaluator<Predicate = Predicate>) -> bool {
