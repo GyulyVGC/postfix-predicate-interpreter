@@ -1,4 +1,7 @@
-use rpn_predicate_interpreter::{Operator, PostfixExpression, PostfixToken, PredicateEvaluator};
+use rpn_predicate_interpreter::{
+    InfixExpression, InfixToken, Operator, Parenthesis, PostfixExpression, PostfixToken,
+    PredicateEvaluator,
+};
 
 struct Predicate {
     condition: PredicateCondition,
@@ -249,6 +252,185 @@ fn test_postfix_evaluate_many_or() {
     assert!(expr.evaluate(&MyReal { val: 3.0 }));
     assert!(expr.evaluate(&MyReal { val: 4.0 }));
     assert!(!expr.evaluate(&MyReal { val: 5.0 }));
+}
+
+#[test]
+// abc+* --> a*(b+c)
+fn test_postfix_to_infix_parenthesis() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+        PostfixToken::Predicate("c"),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Operator(Operator::And),
+    ])
+    .unwrap();
+
+    let infix = postfix.to_infix();
+    assert_eq!(
+        infix,
+        InfixExpression::from_tokens(vec![
+            InfixToken::Predicate("a"),
+            InfixToken::Operator(Operator::And),
+            InfixToken::Parenthesis(Parenthesis::Open),
+            InfixToken::Predicate("b"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("c"),
+            InfixToken::Parenthesis(Parenthesis::Close),
+        ])
+        .unwrap()
+    );
+}
+
+#[test]
+// ab*c+ --> a*b+c
+fn test_postfix_to_infix_plain() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Predicate("c"),
+        PostfixToken::Operator(Operator::Or),
+    ])
+    .unwrap();
+
+    let infix = postfix.to_infix();
+    assert_eq!(
+        infix,
+        InfixExpression::from_tokens(vec![
+            InfixToken::Predicate("a"),
+            InfixToken::Operator(Operator::And),
+            InfixToken::Predicate("b"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("c"),
+        ])
+        .unwrap()
+    );
+}
+
+#[test]
+// a --> a
+fn test_postfix_to_infix_single() {
+    let postfix = PostfixExpression::from_tokens(vec![PostfixToken::Predicate("a")]).unwrap();
+
+    let infix = postfix.to_infix();
+    assert_eq!(
+        infix,
+        InfixExpression::from_tokens(vec![InfixToken::Predicate("a")]).unwrap()
+    );
+}
+
+#[test]
+// ab+ --> a+b
+fn test_postfix_to_infix_simple() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+        PostfixToken::Operator(Operator::Or),
+    ])
+    .unwrap();
+
+    let infix = postfix.to_infix();
+    assert_eq!(
+        infix,
+        InfixExpression::from_tokens(vec![
+            InfixToken::Predicate("a"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("b"),
+        ])
+        .unwrap()
+    );
+}
+
+#[test]
+// ab*c*d* --> a*b*c*d
+// ab+c+d+ --> a+b+c+d
+fn test_postfix_to_infix_and_or() {
+    for op in [Operator::And, Operator::Or] {
+        let postfix = PostfixExpression::from_tokens(vec![
+            PostfixToken::Predicate("a"),
+            PostfixToken::Predicate("b"),
+            PostfixToken::Operator(op),
+            PostfixToken::Predicate("c"),
+            PostfixToken::Operator(op),
+            PostfixToken::Predicate("d"),
+            PostfixToken::Operator(op),
+        ])
+        .unwrap();
+
+        let infix = postfix.to_infix();
+        assert_eq!(
+            infix,
+            InfixExpression::from_tokens(vec![
+                InfixToken::Predicate("a"),
+                InfixToken::Operator(op),
+                InfixToken::Predicate("b"),
+                InfixToken::Operator(op),
+                InfixToken::Predicate("c"),
+                InfixToken::Operator(op),
+                InfixToken::Predicate("d"),
+            ])
+            .unwrap()
+        );
+    }
+}
+
+#[test]
+// abc+def+*+g+*h+ij*+ --> a*(b+c+d*(e+f)+g)+h+i*j
+fn test_postfix_to_infix_complex() {
+    let postfix = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate("a"),
+        PostfixToken::Predicate("b"),
+        PostfixToken::Predicate("c"),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate("d"),
+        PostfixToken::Predicate("e"),
+        PostfixToken::Predicate("f"),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate("g"),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Predicate("h"),
+        PostfixToken::Operator(Operator::Or),
+        PostfixToken::Predicate("i"),
+        PostfixToken::Predicate("j"),
+        PostfixToken::Operator(Operator::And),
+        PostfixToken::Operator(Operator::Or),
+    ])
+    .unwrap();
+
+    let infix = postfix.to_infix();
+    assert_eq!(
+        infix,
+        InfixExpression::from_tokens(vec![
+            InfixToken::Predicate("a"),
+            InfixToken::Operator(Operator::And),
+            InfixToken::Parenthesis(Parenthesis::Open),
+            InfixToken::Predicate("b"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("c"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("d"),
+            InfixToken::Operator(Operator::And),
+            InfixToken::Parenthesis(Parenthesis::Open),
+            InfixToken::Predicate("e"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("f"),
+            InfixToken::Parenthesis(Parenthesis::Close),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("g"),
+            InfixToken::Parenthesis(Parenthesis::Close),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("h"),
+            InfixToken::Operator(Operator::Or),
+            InfixToken::Predicate("i"),
+            InfixToken::Operator(Operator::And),
+            InfixToken::Predicate("j"),
+        ])
+        .unwrap()
+    );
 }
 
 #[test]

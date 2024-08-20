@@ -1,6 +1,7 @@
 use crate::internals::infix_stack_item::InfixStackItem;
 use crate::{InfixToken, Parenthesis, PostfixExpression, PostfixToken};
 
+#[derive(Debug, PartialEq)]
 pub struct InfixExpression<Predicate> {
     tokens: Vec<InfixToken<Predicate>>,
 }
@@ -51,6 +52,10 @@ impl<Predicate> InfixExpression<Predicate> {
         }
 
         PostfixExpression::from_tokens_unchecked(output_queue)
+    }
+
+    pub(crate) fn from_tokens_unchecked(tokens: Vec<InfixToken<Predicate>>) -> Self {
+        Self { tokens }
     }
 
     fn are_tokens_valid(tokens: &[InfixToken<Predicate>]) -> bool {
