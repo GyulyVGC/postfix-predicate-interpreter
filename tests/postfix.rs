@@ -255,6 +255,25 @@ fn test_postfix_evaluate_many_or() {
 }
 
 #[test]
+fn test_postfix_evaluate_booleans() {
+    let expr1 = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate(true),
+        PostfixToken::Predicate(false),
+        PostfixToken::Operator(Operator::And),
+    ])
+    .unwrap();
+    let expr2 = PostfixExpression::from_tokens(vec![
+        PostfixToken::Predicate(true),
+        PostfixToken::Predicate(false),
+        PostfixToken::Operator(Operator::Or),
+    ])
+    .unwrap();
+
+    assert!(!expr1.evaluate(&()));
+    assert!(expr2.evaluate(&()));
+}
+
+#[test]
 // abc+* --> a*(b+c)
 fn test_postfix_to_infix_parenthesis() {
     let postfix = PostfixExpression::from_tokens(vec![

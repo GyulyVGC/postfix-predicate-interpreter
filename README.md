@@ -42,9 +42,9 @@ let postfix = infix.to_postfix();
 assert_eq!(
     postfix,
     PostfixExpression::from_tokens(vec![
-        PostfixToken::Predicate("a"),
-        PostfixToken::Predicate("b"),
-        PostfixToken::Predicate("c"),
+        PostfixToken::Predicate("A"),
+        PostfixToken::Predicate("B"),
+        PostfixToken::Predicate("C"),
         PostfixToken::Operator(Operator::Or),
         PostfixToken::Operator(Operator::And),
     ])
@@ -54,7 +54,7 @@ assert_eq!(
 
 Finally, we can evaluate the postfix expression:
 ``` rust
-postfix.evaluate(&predicate_evaluator);
+let result = postfix.evaluate(&predicate_evaluator);
 ```
 
 Note that predicates are represented as letters in this example (`A`, `B`, `C`),
@@ -64,7 +64,6 @@ such an object is passed as argument to the `evaluate` method, making it possibl
 
 > [!NOTE]
 > 
-> In the scope of this library, an expression can't be evaluated without a predicate evaluator.<br/>
-> Aim of the library is in fact to evaluate expressions whose results depend on an external context,
+> The aim of the library is to evaluate expressions whose results depend on an external context,
 > represented by the value of the predicate evaluator.
     

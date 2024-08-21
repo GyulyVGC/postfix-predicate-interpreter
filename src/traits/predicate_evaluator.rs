@@ -3,3 +3,11 @@ pub trait PredicateEvaluator {
 
     fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool;
 }
+
+impl PredicateEvaluator for () {
+    type Predicate = bool;
+
+    fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
+        *predicate
+    }
+}
