@@ -3,13 +3,11 @@ use rpn_predicate_interpreter::{
     PredicateEvaluator,
 };
 
-#[derive(Clone)]
 struct Predicate {
     condition: PredicateCondition,
     val: String,
 }
 
-#[derive(Clone)]
 enum PredicateCondition {
     Equal,
     NotEqual,

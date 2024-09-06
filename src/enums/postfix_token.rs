@@ -1,6 +1,6 @@
 use crate::enums::operator::Operator;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq)]
 pub enum PostfixToken<Predicate> {
     Operator(Operator),
     Predicate(Predicate),
