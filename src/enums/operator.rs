@@ -1,4 +1,6 @@
-#[derive(PartialEq, Copy, Clone, Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Operator {
     And,
     Or,

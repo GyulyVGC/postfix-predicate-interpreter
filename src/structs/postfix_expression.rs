@@ -3,8 +3,9 @@ use crate::internals::postfix_stack_item::PostfixStackItem;
 use crate::traits::predicate_evaluator::PredicateEvaluator;
 use crate::{InfixExpression, InfixToken, Operator, Parenthesis};
 use std::collections::VecDeque;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct PostfixExpression<Predicate> {
     tokens: Vec<PostfixToken<Predicate>>,
 }
