@@ -9,10 +9,14 @@ pub struct PostfixExpression<Predicate> {
     tokens: Vec<PostfixToken<Predicate>>,
 }
 
-impl<Predicate> PostfixExpression<Predicate> {
+impl<Predicate: Clone> PostfixExpression<Predicate> {
     #[must_use]
     pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Option<Self> {
         Self::are_tokens_valid(&tokens).then(|| Self { tokens })
+    }
+
+    pub fn get_tokens(&self) -> Vec<PostfixToken<Predicate>> {
+        self.tokens.clone()
     }
 
     #[must_use]
