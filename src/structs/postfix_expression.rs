@@ -15,7 +15,6 @@ impl<Predicate: Clone> PostfixExpression<Predicate> {
         Self::are_tokens_valid(&tokens).then(|| Self { tokens })
     }
 
-    #[must_use]
     pub fn get_tokens(&self) -> Vec<PostfixToken<Predicate>> {
         self.tokens.clone()
     }
