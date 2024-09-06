@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Operator {
     And,
     Or,
