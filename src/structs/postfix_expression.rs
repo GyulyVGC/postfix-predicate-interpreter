@@ -86,7 +86,7 @@ impl<Predicate> PostfixExpression<Predicate> {
         Self { tokens }
     }
 
-    fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
+    pub fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
         let mut cnt: usize = 0;
 
         for token in tokens {
