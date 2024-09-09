@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::enums::operator::Operator;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "type")]

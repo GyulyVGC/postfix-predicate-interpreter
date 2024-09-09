@@ -2,11 +2,13 @@ use crate::enums::postfix_token::PostfixToken;
 use crate::internals::postfix_stack_item::PostfixStackItem;
 use crate::traits::predicate_evaluator::PredicateEvaluator;
 use crate::{InfixExpression, InfixToken, Operator, Parenthesis};
-use std::collections::VecDeque;
 use serde::{Deserialize, Serialize};
+use std::collections::VecDeque;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub struct PostfixExpression<Predicate> {
+    #[serde(rename = "postfix_tokens")]
     tokens: Vec<PostfixToken<Predicate>>,
 }
 
