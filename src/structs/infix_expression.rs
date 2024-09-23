@@ -1,8 +1,11 @@
 use crate::internals::infix_stack_item::InfixStackItem;
 use crate::{InfixToken, Parenthesis, PostfixExpression, PostfixToken};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub struct InfixExpression<Predicate> {
+    #[serde(rename = "infix_tokens")]
     tokens: Vec<InfixToken<Predicate>>,
 }
 
@@ -56,6 +59,10 @@ impl<Predicate> InfixExpression<Predicate> {
 
     pub(crate) fn from_tokens_unchecked(tokens: Vec<InfixToken<Predicate>>) -> Self {
         Self { tokens }
+    }
+
+    pub fn is_valid(&self) -> bool {
+        Self::are_tokens_valid(&self.tokens)
     }
 
     fn are_tokens_valid(tokens: &[InfixToken<Predicate>]) -> bool {

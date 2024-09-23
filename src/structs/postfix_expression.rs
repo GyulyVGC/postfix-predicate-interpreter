@@ -2,10 +2,13 @@ use crate::enums::postfix_token::PostfixToken;
 use crate::internals::postfix_stack_item::PostfixStackItem;
 use crate::traits::predicate_evaluator::PredicateEvaluator;
 use crate::{InfixExpression, InfixToken, Operator, Parenthesis};
+use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub struct PostfixExpression<Predicate> {
+    #[serde(rename = "postfix_tokens")]
     tokens: Vec<PostfixToken<Predicate>>,
 }
 
@@ -83,6 +86,10 @@ impl<Predicate> PostfixExpression<Predicate> {
 
     pub(crate) fn from_tokens_unchecked(tokens: Vec<PostfixToken<Predicate>>) -> Self {
         Self { tokens }
+    }
+
+    pub fn is_valid(&self) -> bool {
+        Self::are_tokens_valid(&self.tokens)
     }
 
     fn are_tokens_valid(tokens: &[PostfixToken<Predicate>]) -> bool {
