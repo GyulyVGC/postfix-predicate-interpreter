@@ -23,25 +23,17 @@ impl PredicateEvaluator for MyInteger {
     type Predicate = Predicate;
     type Reason = i32;
 
-    fn evaluate_predicate(
-        &self,
-        predicate: &Self::Predicate,
-        reasons: &mut Vec<Self::Reason>,
-    ) -> bool {
-        let res = match predicate.condition {
+    fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
+        match predicate.condition {
             PredicateCondition::Equal => self.val == predicate.val,
             PredicateCondition::NotEqual => self.val != predicate.val,
             PredicateCondition::GreaterThan => self.val > predicate.val,
             PredicateCondition::LowerThan => self.val < predicate.val,
-        };
-
-        if res {
-            reasons.push(predicate.val);
-        } else {
-            reasons.retain(|_| false);
         }
+    }
 
-        res
+    fn get_reason(&self, predicate: &Self::Predicate) -> Self::Reason {
+        predicate.val
     }
 }
 

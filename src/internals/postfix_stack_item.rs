@@ -13,7 +13,7 @@ impl<Predicate> PostfixStackItem<'_, Predicate> {
     ) -> bool {
         match self {
             PostfixStackItem::Predicate(predicate) => {
-                evaluator.evaluate_predicate(predicate, reasons)
+                evaluator.evaluate_predicate_with_reasons(predicate, reasons)
             }
             PostfixStackItem::Result(result) => *result,
         }
@@ -34,16 +34,16 @@ mod tests {
         type Predicate = bool;
         type Reason = i32;
 
-        fn evaluate_predicate(
-            &self,
-            predicate: &Self::Predicate,
-            _reasons: &mut Vec<Self::Reason>,
-        ) -> bool {
+        fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
             if self.val >= 0 {
                 *predicate
             } else {
                 !*predicate
             }
+        }
+
+        fn get_reason(&self, _predicate: &Self::Predicate) -> Self::Reason {
+            self.val
         }
     }
 
