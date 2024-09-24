@@ -5,7 +5,7 @@ use rpn_predicate_interpreter::{
 
 struct Predicate {
     condition: PredicateCondition,
-    val: String,
+    val: i32,
 }
 
 enum PredicateCondition {
@@ -19,44 +19,26 @@ struct MyInteger {
     val: i32,
 }
 
-struct MyReal {
-    val: f32,
-}
-
 impl PredicateEvaluator for MyInteger {
     type Predicate = Predicate;
+    type Reason = i32;
 
-    fn evaluate_predicate(&self, predicate: &Self::Predicate, reasons: &mut Vec<String>) -> bool {
+    fn evaluate_predicate(
+        &self,
+        predicate: &Self::Predicate,
+        reasons: &mut Vec<Self::Reason>,
+    ) -> bool {
         let res = match predicate.condition {
-            PredicateCondition::Equal => self.val == predicate.val.parse().unwrap(),
-            PredicateCondition::NotEqual => self.val != predicate.val.parse().unwrap(),
-            PredicateCondition::GreaterThan => self.val > predicate.val.parse().unwrap(),
-            PredicateCondition::LowerThan => self.val < predicate.val.parse().unwrap(),
+            PredicateCondition::Equal => self.val == predicate.val,
+            PredicateCondition::NotEqual => self.val != predicate.val,
+            PredicateCondition::GreaterThan => self.val > predicate.val,
+            PredicateCondition::LowerThan => self.val < predicate.val,
         };
 
         if res {
-            reasons.push(predicate.val.clone());
+            reasons.push(predicate.val);
         } else {
             reasons.retain(|_| false);
-        }
-
-        res
-    }
-}
-
-impl PredicateEvaluator for MyReal {
-    type Predicate = Predicate;
-
-    fn evaluate_predicate(&self, predicate: &Self::Predicate, reasons: &mut Vec<String>) -> bool {
-        let res = match predicate.condition {
-            PredicateCondition::Equal => self.val == predicate.val.parse().unwrap(),
-            PredicateCondition::NotEqual => self.val != predicate.val.parse().unwrap(),
-            PredicateCondition::GreaterThan => self.val > predicate.val.parse().unwrap(),
-            PredicateCondition::LowerThan => self.val < predicate.val.parse().unwrap(),
-        };
-
-        if res {
-            reasons.push(predicate.val.clone());
         }
 
         res
@@ -68,7 +50,7 @@ impl PredicateEvaluator for MyReal {
 fn test_postfix_evaluate_single() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
-        val: "33".to_string(),
+        val: 33,
     };
 
     let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]).unwrap();
@@ -79,21 +61,9 @@ fn test_postfix_evaluate_single() {
 
     let res = expr.evaluate(&MyInteger { val: 33 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["33".to_string()]);
+    assert_eq!(res.1, vec![33]);
 
     let res = expr.evaluate(&MyInteger { val: 12 });
-    assert!(!res.0);
-    assert!(res.1.is_empty());
-
-    let res = expr.evaluate(&MyReal { val: 34.0 });
-    assert!(!res.0);
-    assert!(res.1.is_empty());
-
-    let res = expr.evaluate(&MyReal { val: 33.0 });
-    assert!(res.0);
-    assert_eq!(res.1, vec!["33".to_string()]);
-
-    let res = expr.evaluate(&MyReal { val: 12.0 });
     assert!(!res.0);
     assert!(res.1.is_empty());
 }
@@ -103,11 +73,11 @@ fn test_postfix_evaluate_single() {
 fn test_postfix_evaluate_simple() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
-        val: "33".to_string(),
+        val: 33,
     };
     let b = Predicate {
         condition: PredicateCondition::LowerThan,
-        val: "10".to_string(),
+        val: 10,
     };
 
     let expr = PostfixExpression::from_tokens(vec![
@@ -123,7 +93,7 @@ fn test_postfix_evaluate_simple() {
 
     let res = expr.evaluate(&MyInteger { val: 33 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["33".to_string()]);
+    assert_eq!(res.1, vec![33]);
 
     let res = expr.evaluate(&MyInteger { val: 12 });
     assert!(!res.0);
@@ -139,29 +109,19 @@ fn test_postfix_evaluate_simple() {
 
     let res = expr.evaluate(&MyInteger { val: 9 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["10".to_string()]);
+    assert_eq!(res.1, vec![10]);
 
     let res = expr.evaluate(&MyInteger { val: 8 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["10".to_string()]);
+    assert_eq!(res.1, vec![10]);
 
     let res = expr.evaluate(&MyInteger { val: 7 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["10".to_string()]);
+    assert_eq!(res.1, vec![10]);
 
     let res = expr.evaluate(&MyInteger { val: 6 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["10".to_string()]);
-
-    assert!(!expr.evaluate(&MyReal { val: 34.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 33.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 12.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 11.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 10.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 9.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 8.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 7.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 6.0 }).0);
+    assert_eq!(res.1, vec![10]);
 }
 
 #[test]
@@ -169,31 +129,31 @@ fn test_postfix_evaluate_simple() {
 fn test_postfix_evaluate_complex() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
-        val: "5".to_string(),
+        val: 5,
     };
     let b = Predicate {
         condition: PredicateCondition::Equal,
-        val: "3".to_string(),
+        val: 3,
     };
     let c = Predicate {
         condition: PredicateCondition::NotEqual,
-        val: "4".to_string(),
+        val: 4,
     };
     let d = Predicate {
         condition: PredicateCondition::GreaterThan,
-        val: "6".to_string(),
+        val: 6,
     };
     let e = Predicate {
         condition: PredicateCondition::LowerThan,
-        val: "9".to_string(),
+        val: 9,
     };
     let f = Predicate {
         condition: PredicateCondition::Equal,
-        val: "7".to_string(),
+        val: 7,
     };
     let g = Predicate {
         condition: PredicateCondition::NotEqual,
-        val: "8".to_string(),
+        val: 8,
     };
 
     let expr = PostfixExpression::from_tokens(vec![
@@ -223,7 +183,7 @@ fn test_postfix_evaluate_complex() {
 
     let res = expr.evaluate(&MyInteger { val: 5 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["5".to_string()]);
+    assert_eq!(res.1, vec![5]);
 
     let res = expr.evaluate(&MyInteger { val: 4 });
     assert!(!res.0);
@@ -231,16 +191,7 @@ fn test_postfix_evaluate_complex() {
 
     let res = expr.evaluate(&MyInteger { val: 3 });
     assert!(res.0);
-    assert_eq!(
-        res.1,
-        vec!["8".to_string(), "9".to_string(), "3".to_string(),]
-    );
-
-    assert!(!expr.evaluate(&MyReal { val: 7.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 6.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 5.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 4.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 3.0 }).0);
+    assert_eq!(res.1, vec![8, 9, 3]);
 }
 
 #[test]
@@ -248,19 +199,19 @@ fn test_postfix_evaluate_complex() {
 fn test_postfix_evaluate_many_and() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
-        val: "1".to_string(),
+        val: 1,
     };
     let b = Predicate {
         condition: PredicateCondition::NotEqual,
-        val: "2".to_string(),
+        val: 2,
     };
     let c = Predicate {
         condition: PredicateCondition::NotEqual,
-        val: "3".to_string(),
+        val: 3,
     };
     let d = Predicate {
         condition: PredicateCondition::LowerThan,
-        val: "4".to_string(),
+        val: 4,
     };
 
     let expr = PostfixExpression::from_tokens(vec![
@@ -280,18 +231,7 @@ fn test_postfix_evaluate_many_and() {
 
     let res = expr.evaluate(&MyInteger { val: 1 });
     assert!(res.0);
-    assert_eq!(
-        res.1,
-        vec![
-            "1".to_string(),
-            "2".to_string(),
-            "3".to_string(),
-            "4".to_string()
-        ]
-    );
-
-    assert!(!expr.evaluate(&MyReal { val: 7.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 1.0 }).0);
+    assert_eq!(res.1, vec![1, 2, 3, 4]);
 }
 
 #[test]
@@ -299,19 +239,19 @@ fn test_postfix_evaluate_many_and() {
 fn test_postfix_evaluate_many_or() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
-        val: "1".to_string(),
+        val: 1,
     };
     let b = Predicate {
         condition: PredicateCondition::Equal,
-        val: "2".to_string(),
+        val: 2,
     };
     let c = Predicate {
         condition: PredicateCondition::GreaterThan,
-        val: "2".to_string(),
+        val: 2,
     };
     let d = Predicate {
         condition: PredicateCondition::Equal,
-        val: "4".to_string(),
+        val: 4,
     };
 
     let expr = PostfixExpression::from_tokens(vec![
@@ -331,25 +271,19 @@ fn test_postfix_evaluate_many_or() {
 
     let res = expr.evaluate(&MyInteger { val: 1 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["1".to_string()]);
+    assert_eq!(res.1, vec![1]);
 
     let res = expr.evaluate(&MyInteger { val: 2 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["2".to_string()]);
+    assert_eq!(res.1, vec![2]);
 
     let res = expr.evaluate(&MyInteger { val: 3 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["2".to_string()]);
+    assert_eq!(res.1, vec![2]);
 
     let res = expr.evaluate(&MyInteger { val: 4 });
     assert!(res.0);
-    assert_eq!(res.1, vec!["2".to_string()]);
-
-    assert!(!expr.evaluate(&MyReal { val: 0.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 1.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 2.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 3.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 4.0 }).0);
+    assert_eq!(res.1, vec![2]);
 }
 
 // #[test]

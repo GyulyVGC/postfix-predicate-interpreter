@@ -32,11 +32,12 @@ mod tests {
 
     impl PredicateEvaluator for MyInteger {
         type Predicate = bool;
+        type Reason = i32;
 
         fn evaluate_predicate(
             &self,
             predicate: &Self::Predicate,
-            _reasons: &mut Vec<String>,
+            _reasons: &mut Vec<Self::Reason>,
         ) -> bool {
             if self.val >= 0 {
                 *predicate
