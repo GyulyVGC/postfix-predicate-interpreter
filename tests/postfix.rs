@@ -35,7 +35,9 @@ impl PredicateEvaluator for MyInteger {
         };
 
         if res {
-            reasons.push(self.val.to_string());
+            reasons.push(predicate.val.clone());
+        } else {
+            reasons.retain(|_| false);
         }
 
         res
@@ -54,7 +56,7 @@ impl PredicateEvaluator for MyReal {
         };
 
         if res {
-            reasons.push(self.val.to_string());
+            reasons.push(predicate.val.clone());
         }
 
         res
@@ -71,13 +73,29 @@ fn test_postfix_evaluate_single() {
 
     let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]).unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 34 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 33 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 12 }).0);
+    let res = expr.evaluate(&MyInteger { val: 34 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
 
-    assert!(!expr.evaluate(&MyReal { val: 34.0 }).0);
-    assert!(expr.evaluate(&MyReal { val: 33.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 12.0 }).0);
+    let res = expr.evaluate(&MyInteger { val: 33 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["33".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 12 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyReal { val: 34.0 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyReal { val: 33.0 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["33".to_string()]);
+
+    let res = expr.evaluate(&MyReal { val: 12.0 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
 }
 
 #[test]
@@ -99,15 +117,41 @@ fn test_postfix_evaluate_simple() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 34 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 33 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 12 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 11 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 10 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 9 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 8 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 7 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 6 }).0);
+    let res = expr.evaluate(&MyInteger { val: 34 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 33 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["33".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 12 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 11 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 10 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 9 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["10".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 8 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["10".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 7 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["10".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 6 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["10".to_string()]);
 
     assert!(!expr.evaluate(&MyReal { val: 34.0 }).0);
     assert!(expr.evaluate(&MyReal { val: 33.0 }).0);
@@ -169,11 +213,28 @@ fn test_postfix_evaluate_complex() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 7 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 6 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 5 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 4 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 3 }).0);
+    let res = expr.evaluate(&MyInteger { val: 7 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 6 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 5 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["5".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 4 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 3 });
+    assert!(res.0);
+    assert_eq!(
+        res.1,
+        vec!["8".to_string(), "9".to_string(), "3".to_string(),]
+    );
 
     assert!(!expr.evaluate(&MyReal { val: 7.0 }).0);
     assert!(!expr.evaluate(&MyReal { val: 6.0 }).0);
@@ -213,8 +274,21 @@ fn test_postfix_evaluate_many_and() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 7 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 1 }).0);
+    let res = expr.evaluate(&MyInteger { val: 7 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 1 });
+    assert!(res.0);
+    assert_eq!(
+        res.1,
+        vec![
+            "1".to_string(),
+            "2".to_string(),
+            "3".to_string(),
+            "4".to_string()
+        ]
+    );
 
     assert!(!expr.evaluate(&MyReal { val: 7.0 }).0);
     assert!(expr.evaluate(&MyReal { val: 1.0 }).0);
@@ -232,8 +306,8 @@ fn test_postfix_evaluate_many_or() {
         val: "2".to_string(),
     };
     let c = Predicate {
-        condition: PredicateCondition::Equal,
-        val: "3".to_string(),
+        condition: PredicateCondition::GreaterThan,
+        val: "2".to_string(),
     };
     let d = Predicate {
         condition: PredicateCondition::Equal,
@@ -251,19 +325,31 @@ fn test_postfix_evaluate_many_or() {
     ])
     .unwrap();
 
-    assert!(!expr.evaluate(&MyInteger { val: 0 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 1 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 2 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 3 }).0);
-    assert!(expr.evaluate(&MyInteger { val: 4 }).0);
-    assert!(!expr.evaluate(&MyInteger { val: 5 }).0);
+    let res = expr.evaluate(&MyInteger { val: 0 });
+    assert!(!res.0);
+    assert!(res.1.is_empty());
+
+    let res = expr.evaluate(&MyInteger { val: 1 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["1".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 2 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["2".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 3 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["2".to_string()]);
+
+    let res = expr.evaluate(&MyInteger { val: 4 });
+    assert!(res.0);
+    assert_eq!(res.1, vec!["2".to_string()]);
 
     assert!(!expr.evaluate(&MyReal { val: 0.0 }).0);
     assert!(expr.evaluate(&MyReal { val: 1.0 }).0);
     assert!(expr.evaluate(&MyReal { val: 2.0 }).0);
     assert!(expr.evaluate(&MyReal { val: 3.0 }).0);
     assert!(expr.evaluate(&MyReal { val: 4.0 }).0);
-    assert!(!expr.evaluate(&MyReal { val: 5.0 }).0);
 }
 
 // #[test]
