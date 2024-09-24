@@ -58,8 +58,12 @@ impl<Predicate> PostfixExpression<Predicate> {
         InfixExpression::from_tokens_unchecked(output_stack.remove(0).into())
     }
 
-    pub fn evaluate(&self, evaluator: &dyn PredicateEvaluator<Predicate = Predicate>) -> bool {
+    pub fn evaluate(
+        &self,
+        evaluator: &dyn PredicateEvaluator<Predicate = Predicate>,
+    ) -> (bool, Vec<String>) {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();
+        let mut reasons: Vec<String> = Vec::new();
         for token in &self.tokens {
             match token {
                 PostfixToken::Operator(op) => {
@@ -71,8 +75,14 @@ impl<Predicate> PostfixExpression<Predicate> {
                         std::mem::swap(&mut p1, &mut p2);
                     }
                     let result = match op {
-                        Operator::And => p1.evaluate(evaluator) && p2.evaluate(evaluator),
-                        Operator::Or => p1.evaluate(evaluator) || p2.evaluate(evaluator),
+                        Operator::And => {
+                            p1.evaluate(evaluator, &mut reasons)
+                                && p2.evaluate(evaluator, &mut reasons)
+                        }
+                        Operator::Or => {
+                            p1.evaluate(evaluator, &mut reasons)
+                                || p2.evaluate(evaluator, &mut reasons)
+                        }
                     };
                     stack.push(PostfixStackItem::Result(result));
                 }
@@ -81,7 +91,12 @@ impl<Predicate> PostfixExpression<Predicate> {
                 }
             }
         }
-        stack.remove(stack.len() - 1).evaluate(evaluator)
+
+        let res = stack
+            .remove(stack.len() - 1)
+            .evaluate(evaluator, &mut reasons);
+
+        (res, reasons)
     }
 
     pub(crate) fn from_tokens_unchecked(tokens: Vec<PostfixToken<Predicate>>) -> Self {
