@@ -61,6 +61,7 @@ impl<Predicate> InfixExpression<Predicate> {
         Self { tokens }
     }
 
+    #[must_use]
     pub fn is_valid(&self) -> bool {
         Self::are_tokens_valid(&self.tokens)
     }
