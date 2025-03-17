@@ -6,7 +6,9 @@ pub trait PredicateEvaluator {
 
     fn get_reason(&self, predicate: &Self::Predicate) -> Self::Reason;
 
-    fn is_blacklisted(&self) -> bool;
+    fn is_blacklisted(&self) -> bool {
+        false
+    }
 
     fn evaluate_predicate_with_reasons(
         &self,
