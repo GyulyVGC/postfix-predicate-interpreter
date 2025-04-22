@@ -5,7 +5,7 @@ use crate::{InfixExpression, InfixToken, Operator, Parenthesis};
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct PostfixExpression<Predicate> {
     #[serde(rename = "postfix_tokens")]
