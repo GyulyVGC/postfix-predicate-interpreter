@@ -58,13 +58,9 @@ impl<Predicate> PostfixExpression<Predicate> {
         InfixExpression::from_tokens_unchecked(output_stack.remove(0).into())
     }
 
-    pub fn evaluate<Reason, Direction>(
+    pub fn evaluate<Reason>(
         &self,
-        evaluator: &dyn PredicateEvaluator<
-            Predicate = Predicate,
-            Reason = Reason,
-            Direction = Direction,
-        >,
+        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason>,
     ) -> (bool, Vec<Reason>) {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();
         let mut reasons: Vec<Reason> = Vec::new();
