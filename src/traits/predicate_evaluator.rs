@@ -1,7 +1,6 @@
 pub trait PredicateEvaluator {
     type Predicate;
     type Reason;
-    type Direction;
 
     fn evaluate_predicate(&self, _predicate: &Self::Predicate) -> bool;
 
