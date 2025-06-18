@@ -10,6 +10,10 @@ pub trait PredicateEvaluator {
         false
     }
 
+    fn get_remote_ip(&self) -> String {
+        String::new()
+    }
+
     fn evaluate_predicate_with_reasons(
         &self,
         predicate: &Self::Predicate,
