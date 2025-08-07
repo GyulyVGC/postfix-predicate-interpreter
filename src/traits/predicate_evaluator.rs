@@ -1,10 +1,10 @@
 use async_trait::async_trait;
 
-#[async_trait(?Send)]
+#[async_trait]
 pub trait PredicateEvaluator {
-    type Predicate;
-    type Reason;
-    type Context;
+    type Predicate: Sync;
+    type Reason: Sync + Send;
+    type Context: Sync;
 
     async fn evaluate_predicate(
         &self,
@@ -40,7 +40,7 @@ pub trait PredicateEvaluator {
     }
 }
 
-// #[async_trait(?Send)]
+// #[async_trait]
 // impl PredicateEvaluator for () {
 //     type Predicate = bool;
 //

@@ -5,14 +5,11 @@ pub(crate) enum PostfixStackItem<'a, Predicate> {
     Result(bool),
 }
 
-impl<Predicate> PostfixStackItem<'_, Predicate> {
-    pub(crate) async fn evaluate<Reason, Context>(
+impl<Predicate: Sync> PostfixStackItem<'_, Predicate> {
+    pub(crate) async fn evaluate<Reason: Sync + Send, Context: Sync>(
         &self,
-        evaluator: &dyn PredicateEvaluator<
-            Predicate = Predicate,
-            Reason = Reason,
-            Context = Context,
-        >,
+        evaluator: &(dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason, Context = Context>
+              + Sync),
         reasons: &mut Vec<Reason>,
         context: &Context,
     ) -> bool {
@@ -38,7 +35,7 @@ mod tests {
         val: i32,
     }
 
-    #[async_trait(?Send)]
+    #[async_trait]
     impl PredicateEvaluator for MyInteger {
         type Predicate = bool;
         type Reason = i32;

@@ -20,7 +20,7 @@ struct MyInteger {
     val: i32,
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl PredicateEvaluator for MyInteger {
     type Predicate = Predicate;
     type Reason = i32;

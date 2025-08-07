@@ -9,7 +9,7 @@ pub struct InfixExpression<Predicate> {
     tokens: Vec<InfixToken<Predicate>>,
 }
 
-impl<Predicate> InfixExpression<Predicate> {
+impl<Predicate: Sync> InfixExpression<Predicate> {
     #[must_use]
     pub fn from_tokens(tokens: Vec<InfixToken<Predicate>>) -> Option<Self> {
         Self::are_tokens_valid(&tokens).then(|| Self { tokens })

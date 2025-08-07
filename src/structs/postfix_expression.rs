@@ -12,7 +12,7 @@ pub struct PostfixExpression<Predicate> {
     tokens: Vec<PostfixToken<Predicate>>,
 }
 
-impl<Predicate> PostfixExpression<Predicate> {
+impl<Predicate: Sync> PostfixExpression<Predicate> {
     #[must_use]
     pub fn from_tokens(tokens: Vec<PostfixToken<Predicate>>) -> Option<Self> {
         Self::are_tokens_valid(&tokens).then(|| Self { tokens })
@@ -58,13 +58,10 @@ impl<Predicate> PostfixExpression<Predicate> {
         InfixExpression::from_tokens_unchecked(output_stack.remove(0).into())
     }
 
-    pub async fn evaluate<Reason, Context>(
+    pub async fn evaluate<Reason: Sync + Send, Context: Sync>(
         &self,
-        evaluator: &dyn PredicateEvaluator<
-            Predicate = Predicate,
-            Reason = Reason,
-            Context = Context,
-        >,
+        evaluator: &(dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason, Context = Context>
+              + Sync),
         context: &Context,
     ) -> (bool, Vec<Reason>) {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();
