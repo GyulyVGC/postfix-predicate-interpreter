@@ -6,7 +6,11 @@ pub trait PredicateEvaluator {
     type Reason;
     type Context;
 
-    async fn evaluate_predicate(&self, _predicate: &Self::Predicate, context: &Self::Context) -> bool;
+    async fn evaluate_predicate(
+        &self,
+        _predicate: &Self::Predicate,
+        context: &Self::Context,
+    ) -> bool;
 
     fn get_reason(&self, predicate: &Self::Predicate) -> Self::Reason;
 

@@ -99,7 +99,8 @@ impl<Predicate> PostfixExpression<Predicate> {
 
         let res = stack
             .remove(stack.len() - 1)
-            .evaluate(evaluator, &mut reasons, context).await;
+            .evaluate(evaluator, &mut reasons, context)
+            .await;
 
         (res, reasons)
     }
