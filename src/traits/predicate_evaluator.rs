@@ -1,9 +1,12 @@
+use async_trait::async_trait;
+
+#[async_trait(?Send)]
 pub trait PredicateEvaluator {
     type Predicate;
     type Reason;
     type Context;
 
-    fn evaluate_predicate(&self, _predicate: &Self::Predicate, context: &Self::Context) -> bool;
+    async fn evaluate_predicate(&self, _predicate: &Self::Predicate, context: &Self::Context) -> bool;
 
     fn get_reason(&self, predicate: &Self::Predicate) -> Self::Reason;
 
@@ -15,13 +18,13 @@ pub trait PredicateEvaluator {
         String::new()
     }
 
-    fn evaluate_predicate_with_reasons_and_context(
+    async fn evaluate_predicate_with_reasons_and_context(
         &self,
         predicate: &Self::Predicate,
         reasons: &mut Vec<Self::Reason>,
         context: &Self::Context,
     ) -> bool {
-        let res = self.evaluate_predicate(predicate, context);
+        let res = self.evaluate_predicate(predicate, context).await;
 
         if res {
             reasons.push(self.get_reason(predicate));
