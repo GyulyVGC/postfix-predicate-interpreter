@@ -60,7 +60,11 @@ impl<Predicate> PostfixExpression<Predicate> {
 
     pub fn evaluate<Reason, Context>(
         &self,
-        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason, Context = Context>,
+        evaluator: &dyn PredicateEvaluator<
+            Predicate = Predicate,
+            Reason = Reason,
+            Context = Context,
+        >,
         context: &Context,
     ) -> (bool, Vec<Reason>) {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();

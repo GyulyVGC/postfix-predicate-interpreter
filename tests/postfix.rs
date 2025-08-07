@@ -22,8 +22,9 @@ struct MyInteger {
 impl PredicateEvaluator for MyInteger {
     type Predicate = Predicate;
     type Reason = i32;
+    type Context = ();
 
-    fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
+    fn evaluate_predicate(&self, predicate: &Self::Predicate, _: &()) -> bool {
         match predicate.condition {
             PredicateCondition::Equal => self.val == predicate.val,
             PredicateCondition::NotEqual => self.val != predicate.val,
@@ -47,15 +48,15 @@ fn test_postfix_evaluate_single() {
 
     let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]).unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 34 });
+    let res = expr.evaluate(&MyInteger { val: 34 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 33 });
+    let res = expr.evaluate(&MyInteger { val: 33 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![33]);
 
-    let res = expr.evaluate(&MyInteger { val: 12 });
+    let res = expr.evaluate(&MyInteger { val: 12 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 }
@@ -79,39 +80,39 @@ fn test_postfix_evaluate_simple() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 34 });
+    let res = expr.evaluate(&MyInteger { val: 34 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 33 });
+    let res = expr.evaluate(&MyInteger { val: 33 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![33]);
 
-    let res = expr.evaluate(&MyInteger { val: 12 });
+    let res = expr.evaluate(&MyInteger { val: 12 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 11 });
+    let res = expr.evaluate(&MyInteger { val: 11 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 10 });
+    let res = expr.evaluate(&MyInteger { val: 10 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 9 });
+    let res = expr.evaluate(&MyInteger { val: 9 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 
-    let res = expr.evaluate(&MyInteger { val: 8 });
+    let res = expr.evaluate(&MyInteger { val: 8 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 
-    let res = expr.evaluate(&MyInteger { val: 7 });
+    let res = expr.evaluate(&MyInteger { val: 7 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 
-    let res = expr.evaluate(&MyInteger { val: 6 });
+    let res = expr.evaluate(&MyInteger { val: 6 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 }
@@ -165,23 +166,23 @@ fn test_postfix_evaluate_complex() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 7 });
+    let res = expr.evaluate(&MyInteger { val: 7 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 6 });
+    let res = expr.evaluate(&MyInteger { val: 6 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 5 });
+    let res = expr.evaluate(&MyInteger { val: 5 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![5]);
 
-    let res = expr.evaluate(&MyInteger { val: 4 });
+    let res = expr.evaluate(&MyInteger { val: 4 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 3 });
+    let res = expr.evaluate(&MyInteger { val: 3 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![8, 9, 3]);
 }
@@ -217,11 +218,11 @@ fn test_postfix_evaluate_many_and() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 7 });
+    let res = expr.evaluate(&MyInteger { val: 7 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 1 });
+    let res = expr.evaluate(&MyInteger { val: 1 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![1, 2, 3, 4]);
 }
@@ -257,23 +258,23 @@ fn test_postfix_evaluate_many_or() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 0 });
+    let res = expr.evaluate(&MyInteger { val: 0 }, &());
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 1 });
+    let res = expr.evaluate(&MyInteger { val: 1 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![1]);
 
-    let res = expr.evaluate(&MyInteger { val: 2 });
+    let res = expr.evaluate(&MyInteger { val: 2 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![2]);
 
-    let res = expr.evaluate(&MyInteger { val: 3 });
+    let res = expr.evaluate(&MyInteger { val: 3 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![2]);
 
-    let res = expr.evaluate(&MyInteger { val: 4 });
+    let res = expr.evaluate(&MyInteger { val: 4 }, &());
     assert!(res.0);
     assert_eq!(res.1, vec![2]);
 }

@@ -8,7 +8,11 @@ pub(crate) enum PostfixStackItem<'a, Predicate> {
 impl<Predicate> PostfixStackItem<'_, Predicate> {
     pub(crate) fn evaluate<Reason, Context>(
         &self,
-        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason, Context = Context>,
+        evaluator: &dyn PredicateEvaluator<
+            Predicate = Predicate,
+            Reason = Reason,
+            Context = Context,
+        >,
         reasons: &mut Vec<Reason>,
         context: &Context,
     ) -> bool {
@@ -34,8 +38,9 @@ mod tests {
     impl PredicateEvaluator for MyInteger {
         type Predicate = bool;
         type Reason = i32;
+        type Context = ();
 
-        fn evaluate_predicate(&self, predicate: &Self::Predicate) -> bool {
+        fn evaluate_predicate(&self, predicate: &Self::Predicate, _: &()) -> bool {
             if self.val >= 0 {
                 *predicate
             } else {
@@ -56,20 +61,20 @@ mod tests {
         let int2 = MyInteger { val: 0 };
         let int3 = MyInteger { val: 1 };
 
-        assert!(!PostfixStackItem::Result(p1).evaluate(&int1, &mut Vec::new()));
-        assert!(!PostfixStackItem::Result(p1).evaluate(&int2, &mut Vec::new()));
-        assert!(!PostfixStackItem::Result(p1).evaluate(&int3, &mut Vec::new()));
+        assert!(!PostfixStackItem::Result(p1).evaluate(&int1, &mut Vec::new(), &()));
+        assert!(!PostfixStackItem::Result(p1).evaluate(&int2, &mut Vec::new(), &()));
+        assert!(!PostfixStackItem::Result(p1).evaluate(&int3, &mut Vec::new(), &()));
 
-        assert!(PostfixStackItem::Result(p2).evaluate(&int1, &mut Vec::new()));
-        assert!(PostfixStackItem::Result(p2).evaluate(&int2, &mut Vec::new()));
-        assert!(PostfixStackItem::Result(p2).evaluate(&int3, &mut Vec::new()));
+        assert!(PostfixStackItem::Result(p2).evaluate(&int1, &mut Vec::new(), &()));
+        assert!(PostfixStackItem::Result(p2).evaluate(&int2, &mut Vec::new(), &()));
+        assert!(PostfixStackItem::Result(p2).evaluate(&int3, &mut Vec::new(), &()));
 
-        assert!(PostfixStackItem::Predicate(&p1).evaluate(&int1, &mut Vec::new()));
-        assert!(!PostfixStackItem::Predicate(&p1).evaluate(&int2, &mut Vec::new()));
-        assert!(!PostfixStackItem::Predicate(&p1).evaluate(&int3, &mut Vec::new()));
+        assert!(PostfixStackItem::Predicate(&p1).evaluate(&int1, &mut Vec::new(), &()));
+        assert!(!PostfixStackItem::Predicate(&p1).evaluate(&int2, &mut Vec::new(), &()));
+        assert!(!PostfixStackItem::Predicate(&p1).evaluate(&int3, &mut Vec::new(), &()));
 
-        assert!(!PostfixStackItem::Predicate(&p2).evaluate(&int1, &mut Vec::new()));
-        assert!(PostfixStackItem::Predicate(&p2).evaluate(&int2, &mut Vec::new()));
-        assert!(PostfixStackItem::Predicate(&p2).evaluate(&int3, &mut Vec::new()));
+        assert!(!PostfixStackItem::Predicate(&p2).evaluate(&int1, &mut Vec::new(), &()));
+        assert!(PostfixStackItem::Predicate(&p2).evaluate(&int2, &mut Vec::new(), &()));
+        assert!(PostfixStackItem::Predicate(&p2).evaluate(&int3, &mut Vec::new(), &()));
     }
 }
