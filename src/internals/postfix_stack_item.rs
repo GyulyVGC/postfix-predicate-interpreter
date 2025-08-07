@@ -6,14 +6,15 @@ pub(crate) enum PostfixStackItem<'a, Predicate> {
 }
 
 impl<Predicate> PostfixStackItem<'_, Predicate> {
-    pub(crate) fn evaluate<Reason>(
+    pub(crate) fn evaluate<Reason, Context>(
         &self,
-        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason>,
+        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason, Context = Context>,
         reasons: &mut Vec<Reason>,
+        context: &Context,
     ) -> bool {
         match self {
             PostfixStackItem::Predicate(predicate) => {
-                evaluator.evaluate_predicate_with_reasons(predicate, reasons)
+                evaluator.evaluate_predicate_with_reasons_and_context(predicate, reasons, context)
             }
             PostfixStackItem::Result(result) => *result,
         }

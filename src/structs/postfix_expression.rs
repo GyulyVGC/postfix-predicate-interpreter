@@ -58,9 +58,10 @@ impl<Predicate> PostfixExpression<Predicate> {
         InfixExpression::from_tokens_unchecked(output_stack.remove(0).into())
     }
 
-    pub fn evaluate<Reason>(
+    pub fn evaluate<Reason, Context>(
         &self,
-        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason>,
+        evaluator: &dyn PredicateEvaluator<Predicate = Predicate, Reason = Reason, Context = Context>,
+        context: &Context,
     ) -> (bool, Vec<Reason>) {
         let mut stack: Vec<PostfixStackItem<Predicate>> = Vec::new();
         let mut reasons: Vec<Reason> = Vec::new();
@@ -76,12 +77,12 @@ impl<Predicate> PostfixExpression<Predicate> {
                     }
                     let result = match op {
                         Operator::And => {
-                            p1.evaluate(evaluator, &mut reasons)
-                                && p2.evaluate(evaluator, &mut reasons)
+                            p1.evaluate(evaluator, &mut reasons, context)
+                                && p2.evaluate(evaluator, &mut reasons, context)
                         }
                         Operator::Or => {
-                            p1.evaluate(evaluator, &mut reasons)
-                                || p2.evaluate(evaluator, &mut reasons)
+                            p1.evaluate(evaluator, &mut reasons, context)
+                                || p2.evaluate(evaluator, &mut reasons, context)
                         }
                     };
                     stack.push(PostfixStackItem::Result(result));
@@ -94,7 +95,7 @@ impl<Predicate> PostfixExpression<Predicate> {
 
         let res = stack
             .remove(stack.len() - 1)
-            .evaluate(evaluator, &mut reasons);
+            .evaluate(evaluator, &mut reasons, context);
 
         (res, reasons)
     }
