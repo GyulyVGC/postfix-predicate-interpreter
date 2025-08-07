@@ -6,3 +6,6 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0.210", features = ["derive"] }
 async-trait = "0.1.88"
+
+[dev-dependencies]
+tokio = { version = "1.47.1", features = ["macros", "rt"]}

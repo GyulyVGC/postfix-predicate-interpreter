@@ -40,6 +40,7 @@ pub trait PredicateEvaluator {
     }
 }
 
+// #[async_trait(?Send)]
 // impl PredicateEvaluator for () {
 //     type Predicate = bool;
 //

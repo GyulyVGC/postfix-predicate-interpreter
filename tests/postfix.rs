@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use rpn_predicate_interpreter::{
     InfixExpression, InfixToken, Operator, Parenthesis, PostfixExpression, PostfixToken,
     PredicateEvaluator,
@@ -19,12 +20,13 @@ struct MyInteger {
     val: i32,
 }
 
+#[async_trait(?Send)]
 impl PredicateEvaluator for MyInteger {
     type Predicate = Predicate;
     type Reason = i32;
     type Context = ();
 
-    fn evaluate_predicate(&self, predicate: &Self::Predicate, _: &()) -> bool {
+    async fn evaluate_predicate(&self, predicate: &Self::Predicate, _: &()) -> bool {
         match predicate.condition {
             PredicateCondition::Equal => self.val == predicate.val,
             PredicateCondition::NotEqual => self.val != predicate.val,
@@ -38,9 +40,9 @@ impl PredicateEvaluator for MyInteger {
     }
 }
 
-#[test]
+#[tokio::test]
 // a --> a
-fn test_postfix_evaluate_single() {
+async fn test_postfix_evaluate_single() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: 33,
@@ -48,22 +50,22 @@ fn test_postfix_evaluate_single() {
 
     let expr = PostfixExpression::from_tokens(vec![PostfixToken::Predicate(a)]).unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 34 }, &());
+    let res = expr.evaluate(&MyInteger { val: 34 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 33 }, &());
+    let res = expr.evaluate(&MyInteger { val: 33 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![33]);
 
-    let res = expr.evaluate(&MyInteger { val: 12 }, &());
+    let res = expr.evaluate(&MyInteger { val: 12 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 }
 
-#[test]
+#[tokio::test]
 // a+b --> ab+
-fn test_postfix_evaluate_simple() {
+async fn test_postfix_evaluate_simple() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: 33,
@@ -80,46 +82,46 @@ fn test_postfix_evaluate_simple() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 34 }, &());
+    let res = expr.evaluate(&MyInteger { val: 34 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 33 }, &());
+    let res = expr.evaluate(&MyInteger { val: 33 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![33]);
 
-    let res = expr.evaluate(&MyInteger { val: 12 }, &());
+    let res = expr.evaluate(&MyInteger { val: 12 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 11 }, &());
+    let res = expr.evaluate(&MyInteger { val: 11 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 10 }, &());
+    let res = expr.evaluate(&MyInteger { val: 10 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 9 }, &());
+    let res = expr.evaluate(&MyInteger { val: 9 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 
-    let res = expr.evaluate(&MyInteger { val: 8 }, &());
+    let res = expr.evaluate(&MyInteger { val: 8 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 
-    let res = expr.evaluate(&MyInteger { val: 7 }, &());
+    let res = expr.evaluate(&MyInteger { val: 7 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 
-    let res = expr.evaluate(&MyInteger { val: 6 }, &());
+    let res = expr.evaluate(&MyInteger { val: 6 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![10]);
 }
 
-#[test]
+#[tokio::test]
 // a+b*(c+d+e*(f+g)) --> abcd+efg+*+*+
-fn test_postfix_evaluate_complex() {
+async fn test_postfix_evaluate_complex() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: 5,
@@ -166,30 +168,30 @@ fn test_postfix_evaluate_complex() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 7 }, &());
+    let res = expr.evaluate(&MyInteger { val: 7 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 6 }, &());
+    let res = expr.evaluate(&MyInteger { val: 6 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 5 }, &());
+    let res = expr.evaluate(&MyInteger { val: 5 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![5]);
 
-    let res = expr.evaluate(&MyInteger { val: 4 }, &());
+    let res = expr.evaluate(&MyInteger { val: 4 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 3 }, &());
+    let res = expr.evaluate(&MyInteger { val: 3 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![8, 9, 3]);
 }
 
-#[test]
+#[tokio::test]
 // a*b*c*d --> ab*c*d*
-fn test_postfix_evaluate_many_and() {
+async fn test_postfix_evaluate_many_and() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: 1,
@@ -218,18 +220,18 @@ fn test_postfix_evaluate_many_and() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 7 }, &());
+    let res = expr.evaluate(&MyInteger { val: 7 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 1 }, &());
+    let res = expr.evaluate(&MyInteger { val: 1 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![1, 2, 3, 4]);
 }
 
-#[test]
+#[tokio::test]
 // a+b+c+d --> ab+c+d+
-fn test_postfix_evaluate_many_or() {
+async fn test_postfix_evaluate_many_or() {
     let a = Predicate {
         condition: PredicateCondition::Equal,
         val: 1,
@@ -258,23 +260,23 @@ fn test_postfix_evaluate_many_or() {
     ])
     .unwrap();
 
-    let res = expr.evaluate(&MyInteger { val: 0 }, &());
+    let res = expr.evaluate(&MyInteger { val: 0 }, &()).await;
     assert!(!res.0);
     assert!(res.1.is_empty());
 
-    let res = expr.evaluate(&MyInteger { val: 1 }, &());
+    let res = expr.evaluate(&MyInteger { val: 1 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![1]);
 
-    let res = expr.evaluate(&MyInteger { val: 2 }, &());
+    let res = expr.evaluate(&MyInteger { val: 2 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![2]);
 
-    let res = expr.evaluate(&MyInteger { val: 3 }, &());
+    let res = expr.evaluate(&MyInteger { val: 3 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![2]);
 
-    let res = expr.evaluate(&MyInteger { val: 4 }, &());
+    let res = expr.evaluate(&MyInteger { val: 4 }, &()).await;
     assert!(res.0);
     assert_eq!(res.1, vec![2]);
 }
