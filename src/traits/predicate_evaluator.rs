@@ -14,10 +14,6 @@ pub trait PredicateEvaluator {
 
     fn get_reason(&self, predicate: &Self::Predicate) -> Self::Reason;
 
-    fn is_blacklisted(&self) -> bool {
-        false
-    }
-
     fn get_remote_ip(&self) -> String {
         String::new()
     }
