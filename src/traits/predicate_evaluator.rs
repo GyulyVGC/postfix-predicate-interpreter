@@ -1,3 +1,4 @@
+use std::net::{IpAddr, Ipv4Addr};
 use async_trait::async_trait;
 
 #[async_trait]
@@ -14,8 +15,8 @@ pub trait PredicateEvaluator {
 
     fn get_reason(&self, predicate: &Self::Predicate) -> Self::Reason;
 
-    fn get_remote_ip(&self) -> String {
-        String::new()
+    fn get_remote_ip(&self) -> IpAddr {
+        IpAddr::V4(Ipv4Addr::UNSPECIFIED)
     }
 
     async fn evaluate_predicate_with_reasons_and_context(
